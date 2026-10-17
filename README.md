@@ -113,17 +113,60 @@ Firefox: `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on…*
 A temporary add-on is removed when Firefox quits.
 
 The icons are drawn in `icons-src/` (`poring-small.svg` for 16 and 32 px, `poring-grf.svg` for 48 and
-96 px) and exported to `ext/icons/` with sharp (`tools/client-data/node_modules`).
+96 and 128 px) and exported to `ext/icons/` with sharp (`tools/client-data/node_modules`). The 128 px
+one is the icon AMO shows on the listing.
 
-## Sign (host only)
+## Release (host only)
 
-Bump `version` in `ext/manifest.json`, then:
+Signing needs the AMO API keys, which stay on the host. From the workspace root, on the host:
 
 ```bash
-export AMO_JWT_ISSUER=… AMO_JWT_SECRET=…
-bash robrowser/tools/firefox-ext/relay/sign.sh
+export AMO_JWT_ISSUER=… AMO_JWT_SECRET=…   # addons.mozilla.org > Developer Hub > Manage API Keys
+cd robrowser/tools/firefox-ext/relay && ./sign.sh --channel=listed     # public AMO page
+cd robrowser/tools/firefox-ext/relay && ./sign.sh --channel=unlisted   # or: signed xpi, direct link only
 ```
 
-The signed xpi (unlisted: installable, not listed on AMO) goes to `relay/web-ext-artifacts/`. Install it by
-dropping it on Firefox; it stays across restarts, and installing a newer version over it keeps the stored
-folder.
+Bump `version` in `ext/manifest.json` first: AMO refuses a version it has already seen. `./sign.sh` alone is
+`--channel=unlisted`. `--dry-run` prints the `web-ext sign` command line and stops (no lint, no network, no
+keys needed). Otherwise the script lints, then signs; its output goes to `sign-<date>.log`.
+
+| | `unlisted` (default) | `listed` |
+|---|---|---|
+| Who finds it | whoever has the xpi or its link | anyone, on addons.mozilla.org |
+| Review | automatic, minutes | automatic signing, then a human review that can come later and ask questions |
+| Sent with it | the xpi | the xpi + the listing in [`amo/metadata.json`](amo/metadata.json) (`--amo-metadata`) |
+| Updates | by hand (no `update_url`) | Firefox updates it from AMO |
+| Signed xpi | `web-ext-artifacts/`, once approved | the same, and the AMO page |
+
+`sign.sh` waits up to 45 min for approval. If it times out, the version is still in the queue: the signed
+file is downloaded later from the Developer Hub page that web-ext prints.
+
+### The listing (`amo/`)
+
+| File | Goes to |
+|---|---|
+| [`metadata.json`](amo/metadata.json) | sent by `--channel=listed`: name, summary (≤ 250 characters), description, category `games-entertainment`, homepage and support URL `https://robrowser.suuuper.app/`, licence `GPL-3.0-or-later`, and the reviewer notes (`version.approval_notes`) |
+| [`REVIEWER-NOTES.md`](amo/REVIEWER-NOTES.md) | the readable copy of `version.approval_notes`: why `webRequestBlocking`, `unlimitedStorage` and each of the three hosts |
+| [`PRIVACY.md`](amo/PRIVACY.md) | pasted by hand into Developer Hub → the add-on → **Edit Product Page** → privacy policy (the submission API does not take it) |
+
+The licence is GPL-3.0, the licence of roBrowserLegacy, whose page this extension serves; this repo has no
+licence file of its own. Edit `REVIEWER-NOTES.md`, then copy it into `metadata.json`:
+
+```bash
+cd robrowser/tools/firefox-ext/relay && node -e 'const f=require("fs"),m=JSON.parse(f.readFileSync("amo/metadata.json"));m.version.approval_notes=f.readFileSync("amo/REVIEWER-NOTES.md","utf8").trimEnd();f.writeFileSync("amo/metadata.json",JSON.stringify(m,null,"\t")+"\n")'
+```
+
+The metadata is sent again with every listed version: AMO overwrites the listing with it.
+
+### The add-on id
+
+The id stays `robrowser-relay@robrowser.local` (`browser_specific_settings.gecko.id`), the id 0.1.0 and
+0.2.0 were signed under, so AMO already knows the add-on by it. Firefox ties an
+installed copy, its updates and its stored folder to that id: a new id is a new add-on, and copies installed
+under the old one neither update to it nor keep their folder (the player installs again and drops the folder
+again). The cost of keeping it: `.local` is not a domain anyone owns, which AMO accepts (an id only has to be
+unique) but which reads as a placeholder on a public add-on. Change it, if at all, before the first listed
+version, never after.
+
+Install a signed xpi by dropping it on Firefox; it stays across restarts, and installing a newer version over it
+keeps the stored folder.
