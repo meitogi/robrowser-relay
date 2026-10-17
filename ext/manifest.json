@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "roBrowser relay",
-	"version": "0.2.0",
+	"version": "0.3.0",
 	"description": "Hands your client folder (GRF + BGM) to the roBrowser page on cyro.localhost:6988 or robrowser.suuuper.app/cyro.live, and lets it call the cyro.live API directly.",
 	"browser_specific_settings": {
 		"gecko": {
