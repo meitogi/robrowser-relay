@@ -1,0 +1,148 @@
+/* Shared by the popup and the folder page. Light and dark follow the system (prefers-color-scheme). */
+:root {
+	color-scheme: light dark;
+	--bg: #ffffff;
+	--fg: #1d1d21;
+	--muted: #66666e;
+	--line: #e2e2e6;
+	--card: #f4f4f6;
+	--ready: #2e7d32;
+	--nogrf: #9a5b00;
+	--off: #808088;
+	--primary: #2e7d32;
+	--on-primary: #ffffff;
+}
+@media (prefers-color-scheme: dark) {
+	:root {
+		--bg: #1c1b22;
+		--fg: #fbfbfe;
+		--muted: #a8a8b3;
+		--line: #3a3944;
+		--card: #2b2a33;
+		--ready: #74d17a;
+		--nogrf: #f2b94b;
+		--off: #8f8f99;
+		--primary: #74d17a;
+		--on-primary: #10200f;
+	}
+}
+* {
+	box-sizing: border-box;
+}
+body {
+	margin: 0;
+	background: var(--bg);
+	color: var(--fg);
+	font: 13px/1.45 system-ui, sans-serif;
+}
+.brand {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.brand img {
+	width: 32px;
+	height: 32px;
+}
+.brand strong {
+	display: block;
+	font-size: 14px;
+}
+.brand small,
+.muted {
+	color: var(--muted);
+}
+.status {
+	display: flex;
+	gap: 10px;
+	align-items: flex-start;
+	padding: 10px 12px;
+	border-radius: 8px;
+	background: var(--card);
+}
+.status .mark {
+	flex: none;
+	width: 20px;
+	font-size: 16px;
+	line-height: 20px;
+	text-align: center;
+	color: var(--off);
+}
+.status[data-state='ready'] .mark {
+	color: var(--ready);
+}
+.status[data-state='nogrf'] .mark {
+	color: var(--nogrf);
+}
+.status strong {
+	display: block;
+}
+.status .detail {
+	color: var(--muted);
+	overflow-wrap: anywhere;
+}
+.switch {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 12px;
+	cursor: pointer;
+}
+.switch input {
+	appearance: none;
+	position: relative;
+	flex: none;
+	width: 34px;
+	height: 20px;
+	margin: 0;
+	border-radius: 10px;
+	background: var(--off);
+	cursor: pointer;
+	transition: background 0.15s;
+}
+.switch input::before {
+	content: '';
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	width: 16px;
+	height: 16px;
+	border-radius: 50%;
+	background: #ffffff;
+	transition: transform 0.15s;
+}
+.switch input:checked {
+	background: var(--primary);
+}
+.switch input:checked::before {
+	transform: translateX(14px);
+}
+.btn {
+	display: block;
+	width: 100%;
+	padding: 7px 12px;
+	border: 1px solid var(--line);
+	border-radius: 6px;
+	background: var(--card);
+	color: var(--fg);
+	font: inherit;
+	font-weight: 600;
+	text-align: center;
+	text-decoration: none;
+	cursor: pointer;
+}
+.btn:hover {
+	border-color: var(--muted);
+}
+.btn.primary {
+	border-color: var(--primary);
+	background: var(--primary);
+	color: var(--on-primary);
+}
+.btn[hidden] {
+	display: none;
+}
+:focus-visible {
+	outline: 2px solid var(--primary);
+	outline-offset: 2px;
+}

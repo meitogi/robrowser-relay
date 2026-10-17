@@ -1,21 +1,30 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
+<link rel="stylesheet" href="ui.css">
 <style>
-	body { font: 13px system-ui; margin: 0; padding: 12px; width: 260px; }
-	label { display: flex; gap: 8px; align-items: center; font-weight: 600; }
-	p { margin: 8px 0 0; color: #555; }
-	button { margin-top: 10px; }
+	body { width: 300px; padding: 12px; }
+	body > * + * { margin-top: 10px; }
+	#tab:empty { display: none; }
 </style>
 </head>
 <body>
-<label><input type="checkbox" id="enabled"> Relay on</label>
-<p id="grf">…</p>
-<p id="tab"></p>
-<button id="grant" hidden>Allow access to the game pages and cyro.live</button>
-<button id="store">Choose the client folder…</button>
+<div class="brand">
+	<img src="icons/icon-48.png" alt="">
+	<div><strong>roBrowser relay</strong><small id="version"></small></div>
+</div>
+<div class="status" id="status">
+	<span class="mark" aria-hidden="true"></span>
+	<div><strong></strong><span class="detail">…</span></div>
+</div>
+<p class="muted" id="tab"></p>
+<label class="switch">Relay on <input type="checkbox" role="switch" id="enabled"></label>
+<button class="btn primary" id="grant" hidden>Allow access to the game pages and cyro.live</button>
+<button class="btn" id="store">Choose the client folder…</button>
 <script src="db.js"></script>
+<script src="state.js"></script>
+<script src="ui.js"></script>
 <script src="popup.js"></script>
 </body>
 </html>
