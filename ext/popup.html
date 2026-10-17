@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<style>
+	body { font: 13px system-ui; margin: 0; padding: 12px; width: 260px; }
+	label { display: flex; gap: 8px; align-items: center; font-weight: 600; }
+	p { margin: 8px 0 0; color: #555; }
+	button { margin-top: 10px; }
+</style>
+</head>
+<body>
+<label><input type="checkbox" id="enabled"> Relay on</label>
+<p id="grf">…</p>
+<p id="tab"></p>
+<button id="grant" hidden>Allow access to the game pages and cyro.live</button>
+<button id="store">Choose the client folder…</button>
+<script src="db.js"></script>
+<script src="popup.js"></script>
+</body>
+</html>

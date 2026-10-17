@@ -1,0 +1,59 @@
+{
+	"manifest_version": 3,
+	"name": "roBrowser relay",
+	"version": "0.2.0",
+	"description": "Hands your client folder (GRF + BGM) to the roBrowser page on cyro.localhost:6988 or robrowser.suuuper.app/cyro.live, and lets it call the cyro.live API directly.",
+	"browser_specific_settings": {
+		"gecko": {
+			"id": "robrowser-relay@robrowser.local",
+			"strict_min_version": "142.0",
+			"data_collection_permissions": {
+				"required": [
+					"none"
+				]
+			}
+		}
+	},
+	"background": {
+		"scripts": [
+			"db.js",
+			"background.js"
+		]
+	},
+	"action": {
+		"default_title": "roBrowser relay",
+		"default_popup": "popup.html",
+		"default_icon": {
+			"16": "icons/icon-16.png",
+			"32": "icons/icon-32.png"
+		}
+	},
+	"permissions": [
+		"unlimitedStorage",
+		"webRequest",
+		"webRequestBlocking"
+	],
+	"host_permissions": [
+		"https://cyro.localhost/*",
+		"https://robrowser.suuuper.app/*",
+		"https://cyro.live/*"
+	],
+	"content_scripts": [
+		{
+			"matches": [
+				"https://cyro.localhost/*",
+				"https://robrowser.suuuper.app/cyro.live/*"
+			],
+			"js": [
+				"content.js"
+			],
+			"run_at": "document_start"
+		}
+	],
+	"icons": {
+		"16": "icons/icon-16.png",
+		"32": "icons/icon-32.png",
+		"48": "icons/icon-48.png",
+		"96": "icons/icon-96.png"
+	}
+}

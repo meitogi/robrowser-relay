@@ -1,0 +1,18 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>roBrowser relay: client folder</title>
+<style>body { font: 14px system-ui; margin: 2em; } pre { background: #eee; padding: 1em; }</style>
+</head>
+<body>
+<h1>Client folder</h1>
+<p>The folder grf-serve would serve: <code>data.grf</code> plus its loose files (<code>BGM/</code>, <code>AI/</code>…).
+Loose files win over the archive, as in grf-serve.</p>
+<p><input type="file" id="folder" webkitdirectory></p>
+<p>Or only the GRF: <input type="file" id="grf" accept=".grf"></p>
+<pre id="out">…</pre>
+<script src="db.js"></script>
+<script src="store.js"></script>
+</body>
+</html>

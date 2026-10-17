@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+	<defs>
+		<radialGradient id="body" cx="0.38" cy="0.35" r="0.75">
+			<stop offset="0" stop-color="#ffd3e0"/>
+			<stop offset="0.55" stop-color="#ff9cbb"/>
+			<stop offset="1" stop-color="#e8668f"/>
+		</radialGradient>
+	</defs>
+	<ellipse cx="58" cy="112" rx="40" ry="6" fill="#000" opacity="0.18"/>
+	<path d="M58 10 C61 22 72 28 84 36 C104 50 110 76 102 92 C95 106 78 110 58 110 C38 110 21 106 14 92 C6 76 12 50 32 36 C44 28 55 22 58 10 Z"
+		fill="url(#body)" stroke="#b5446a" stroke-width="3" stroke-linejoin="round"/>
+	<ellipse cx="38" cy="44" rx="10" ry="6" transform="rotate(-35 38 44)" fill="#fff" opacity="0.75"/>
+	<ellipse cx="43" cy="66" rx="5" ry="8.5" fill="#2a1a20"/>
+	<ellipse cx="73" cy="66" rx="5" ry="8.5" fill="#2a1a20"/>
+	<circle cx="44.5" cy="62.5" r="2" fill="#fff"/>
+	<circle cx="74.5" cy="62.5" r="2" fill="#fff"/>
+	<ellipse cx="31" cy="80" rx="7" ry="4" fill="#ff6f98" opacity="0.55"/>
+	<ellipse cx="85" cy="80" rx="7" ry="4" fill="#ff6f98" opacity="0.55"/>
+	<path d="M50 80 Q58 95 66 80 Z" fill="#7a1f3a" stroke="#5c1429" stroke-width="1.5" stroke-linejoin="round"/>
+	<path d="M53.5 85 Q58 91 62.5 85 Q58 83 53.5 85 Z" fill="#ff7a9c"/>
+	<rect x="62" y="90" width="62" height="34" rx="9" fill="#2b2d42" stroke="#fff" stroke-width="3"/>
+	<text x="93" y="115" text-anchor="middle" font-family="DejaVu Sans, Arial, sans-serif" font-weight="bold" font-size="22" fill="#fff">GRF</text>
+</svg>
