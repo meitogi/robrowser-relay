@@ -13,13 +13,16 @@ async function show(extra = '') {
 	showGrant();
 	let loose = 0;
 	let bgm = 0;
+	let system = 0;
 	for (const key in root) {
 		loose++;
 		if (key.startsWith('bgm/')) {
 			bgm++;
+		} else if (key.startsWith('system/')) {
+			system++;
 		}
 	}
-	out.textContent = grf ? `loose files: ${loose} (BGM: ${bgm})${extra}` : extra.trim();
+	out.textContent = grf ? `loose files: ${loose} (BGM: ${bgm}, System: ${system})${extra}` : extra.trim();
 	document.getElementById('play').hidden = state !== 'ready';
 }
 

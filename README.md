@@ -4,7 +4,7 @@ Keeps `wtf robrowser prod --local-grf` (`https://cyro.localhost:6988/api.html?ap
 the local servers are down, and makes its static copy on GitHub Pages playable
 (`https://robrowser.suuuper.app/cyro.live/`, deployed from the fork's `gh-pages` by
 `.github/workflows/pages-sites.yml` + `.github/pages-sites/` on the fork's `master`). You give the extension
-your client folder once (`data.grf` plus its loose files: `BGM/`, `AI/`…); while it is on, the page reads
+your client folder once (`data.grf` plus its loose files: `BGM/`, `AI/`, `System/`…); while it is on, the page reads
 its assets from that folder and calls the cyro.live API directly. The game socket already goes straight to
 `wss://cyro.live`.
 
@@ -87,8 +87,11 @@ twice, in this order:
 ## Use
 
 1. Install (below). The welcome page opens: **Allow access to the game pages and cyro.live** if shown.
-2. Drop `iRO_ver12.0-full-client-data/cyro` on the page, or click it to pick the folder (later: the icon →
-   **Choose the client folder…**). Expect `loose files: 195 (BGM: 185)` and ✓ **Ready**.
+2. Drop `iRO_ver12.0-full-client-data/relay-cyro` on the page, or click it to pick the folder (later: the
+   icon → **Choose the client folder…**). Expect `loose files: 196 (BGM: 185, System: 2)` and ✓ **Ready**.
+   It is `cyro/` (hard links: `data.grf`, `BGM/`, `AI/`) plus the two `System/` files cyro.live has no copy
+   of in its archive: `itemInfo.lub` (the one cyro.live serves) and `achievement_list.lub` (the
+   achievement table for a pre-renewal rAthena; without it the Achievement window lists nothing).
    Firefox's folder picker does not follow symlinks: a linked `BGM/` comes in empty, so copy it instead.
 3. Open `https://cyro.localhost:6988/api.html?app=ONLINE` with `wtf robrowser prod --local-grf` running,
    and reload once: the service worker caches the shell from its second load.

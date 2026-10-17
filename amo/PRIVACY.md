@@ -7,7 +7,7 @@ server of its own; its manifest declares `data_collection_permissions: none`.
 
 Only on your computer, in the extension's own storage (IndexedDB in your Firefox profile):
 
-- the client folder you choose: the game archive (`data.grf`) and its loose files (`BGM/`, `AI/`…);
+- the client folder you choose: the game archive (`data.grf`) and its loose files (`BGM/`, `AI/`, `System/`…);
 - whether the relay is switched on or off.
 
 Nothing else: no account, no password, no browsing history. Uninstalling the extension deletes this
