@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
-# HOST-SIDE ONLY. Lints and signs the relay extension (relay/ext/) on AMO.
+# HOST-SIDE ONLY. Lints and signs the relay extension (ext/) on AMO.
 #   --channel=unlisted  (default) signed xpi, installable from a direct link, not on addons.mozilla.org
 #   --channel=listed    public AMO page; sends the listing from amo/metadata.json (human review)
 #   --dry-run           prints the web-ext command line and stops: no lint, no network, no credentials
 # AMO credentials come from the host environment and never enter the container:
 #   export AMO_JWT_ISSUER=user:12345:678   AMO_JWT_SECRET=...
 # Run from anywhere:  ./sign.sh --channel=listed
-# Bump "version" in relay/ext/manifest.json first: AMO refuses a version it has already seen.
+# Bump "version" in ext/manifest.json first: AMO refuses a version it has already seen.
 set -euo pipefail
 cd "$(dirname "$0")"
 
@@ -28,7 +28,7 @@ if [ -z "$dry" ]; then
 	: "${AMO_JWT_SECRET:?export AMO_JWT_SECRET}"
 fi
 
-WEB_EXT=web-ext@10.7.0
+WEB_EXT=web-ext@10.8.0
 # "Waiting for approval…" prints for every submission; wait up to 45 min instead of the 15 min default.
 sign=(npx --yes "$WEB_EXT" sign --channel="$channel" --approval-timeout 2700000
 	--source-dir ext

@@ -2,7 +2,7 @@
 	"manifest_version": 3,
 	"name": "roBrowser relay",
 	"version": "0.3.0",
-	"description": "Hands your client folder (GRF + BGM) to the roBrowser page on cyro.localhost:6988 or robrowser.suuuper.app/cyro.live, and lets it call the cyro.live API directly.",
+	"description": "Private beta. Hands your own Ragnarok client folder (GRF + BGM) to the roBrowser game pages on robrowser.suuuper.app, and lets them call the cyro.live API directly.",
 	"browser_specific_settings": {
 		"gecko": {
 			"id": "robrowser-relay@robrowser.local",
@@ -42,7 +42,7 @@
 		{
 			"matches": [
 				"https://cyro.localhost/*",
-				"https://robrowser.suuuper.app/cyro.live/*"
+				"https://robrowser.suuuper.app/*"
 			],
 			"js": [
 				"state.js",
@@ -57,5 +57,6 @@
 		"48": "icons/icon-48.png",
 		"96": "icons/icon-96.png",
 		"128": "icons/icon-128.png"
-	}
+	},
+	"homepage_url": "https://github.com/meitogi/robrowser-relay"
 }

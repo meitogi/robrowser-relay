@@ -1,4 +1,4 @@
-// Bridge between the game page (https://cyro.localhost:6988, https://robrowser.suuuper.app/cyro.live/)
+// Bridge between the game pages (https://cyro.localhost:6988, https://robrowser.suuuper.app/<build>/<server>/)
 // and the extension.
 // - <html data-ro-relay="ready|off|nogrf"> and a `ro-relay` event, detail { ready, state, name }, once the
 //   extension state is known (relayState, state.js).

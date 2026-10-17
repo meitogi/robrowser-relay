@@ -15,11 +15,11 @@ storage. Choosing another folder replaces the stored one.
 
 ## What it hands over, and to whom
 
-- **The client folder, to the game page only**, inside Firefox: `https://robrowser.suuuper.app/cyro.live/`
-  and the local copy on your own machine, `https://cyro.localhost/`. The page asks for the files and gets
+- **The client folder, to the game pages only**, inside Firefox: the roBrowser pages on
+  `https://robrowser.suuuper.app/` and their local copy on your own machine, `https://cyro.localhost/`. The page asks for the files and gets
   them within the browser; they are never uploaded.
 - **One response header on the game API.** While the relay is on, it adds `Access-Control-Allow-Origin` to
-  the responses of `https://cyro.live/api/`, so that the two game pages above may read them. It does not
+  the responses of `https://cyro.live/api/`, so that the game pages above may read them. It does not
   read, log or change anything else in those requests or responses, and it touches no other site.
 
 The game page itself talks to the game server (`cyro.live`) as any online game client does; that traffic is
@@ -27,4 +27,4 @@ the page's, not the extension's.
 
 ## Contact
 
-Questions: <https://robrowser.suuuper.app/>.
+Questions: <https://github.com/meitogi/robrowser-relay/issues>.
