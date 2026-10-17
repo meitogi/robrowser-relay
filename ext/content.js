@@ -1,6 +1,7 @@
 // Bridge between the game page (https://cyro.localhost:6988, https://robrowser.suuuper.app/cyro.live/)
 // and the extension.
-// - <html data-ro-relay="ready|off"> and a `ro-relay` event once the extension state is known.
+// - <html data-ro-relay="ready|off|nogrf"> and a `ro-relay` event, detail { ready, state, name }, once the
+//   extension state is known (relayState, state.js).
 // - The page posts { roRelay: 'want-files' }, gets { roRelay: 'files', files: { grf, root } | null }.
 // - The page posts { roRelay: 'used' } once it took the files: the toolbar icon of this tab is marked.
 if (location.port === '6988' || location.hostname === 'robrowser.suuuper.app') {
@@ -22,8 +23,10 @@ if (location.port === '6988' || location.hostname === 'robrowser.suuuper.app') {
 	});
 
 	browser.runtime.sendMessage({ type: 'state' }).then((state) => {
-		const ready = state.enabled && !!state.name;
-		document.documentElement.dataset.roRelay = ready ? 'ready' : 'off';
-		window.dispatchEvent(new CustomEvent('ro-relay', { detail: cloneInto({ ready, name: state.name }, window) }));
+		const relay = relayState(state.enabled, !!state.name);
+		document.documentElement.dataset.roRelay = relay;
+		window.dispatchEvent(
+			new CustomEvent('ro-relay', { detail: cloneInto({ ready: relay === 'ready', state: relay, name: state.name }, window) })
+		);
 	});
 }

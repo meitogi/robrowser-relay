@@ -34,9 +34,9 @@ The page shell works without the relay: drop the `importScripts` line from `sw.j
   resolves a request like `grf-serve.mjs`: loose files, then the archive, then the
   `data/resnametable.txt` alias. `POST /grf/` (`FileManager.search`) is answered from the file table.
   DES-encrypted entries are left to the network (the cyro archive has none).
-- **Load-time signal.** Soon after `document_start` the page gets `<html data-ro-relay="ready|off">` and a
-  `ro-relay` event. The Pages copy's `gate.js` boots the client on `ready` only: neither within 1.5 s means
-  no extension, and the page says so instead of loading `Online.js`.
+- **Load-time signal.** Soon after `document_start` the page gets the relay's state, see
+  [Page contract](#page-contract). The Pages copy's `gate.js` boots the client on `ready` only: no signal
+  within 1.5 s means no extension, and the page says so instead of loading `Online.js`.
 - **Badge.** When the page took the folder (`{ roRelay: 'used' }`) its tab's toolbar icon shows **GRF**.
 - **CORS.** `cyro.live/api` sends no `Access-Control-Allow-Origin`. `webRequest.onHeadersReceived` adds it
   for the two game origins only (`https://cyro.localhost:6988`, `https://robrowser.suuuper.app`), while the
@@ -46,6 +46,33 @@ The page shell works without the relay: drop the `importScripts` line from `sw.j
 
 Measured in Firefox on the cyro archive (4.42 GB, v0x300, 290 305 entries): file table inflated in 95 ms
 and parsed in 23 ms (once per service-worker start), 1000 random entries at 1.75 ms average (worst 123 ms).
+
+## Page contract
+
+On the game pages only (`https://cyro.localhost:6988/*`, `https://robrowser.suuuper.app/cyro.live/*`),
+`content.js` asks the background for the state once, right after `document_start`, then publishes it
+twice, in this order:
+
+1. `document.documentElement.dataset.roRelay` (the `data-ro-relay` attribute of `<html>`) = the state;
+2. a `ro-relay` `CustomEvent` on `window`, `detail` = `{ ready, state, name }`.
+
+| `state` | Meaning | `ready` | `name` |
+|---|---|---|---|
+| `ready` | relay on, client folder stored | `true` | the stored archive's file name (`"data.grf"`) |
+| `nogrf` | relay on, no client folder stored | `false` | `null` |
+| `off` | relay switched off in the popup, folder or not | `false` | the stored archive's name, or `null` |
+| *(nothing)* | extension not installed, disabled, or no host access | — | — |
+
+- One function decides the state, `relayState(enabled, hasGrf)` in `ext/state.js`, shared by the popup and
+  the content script (tested in `../test/relay-state.test.mjs`).
+- The state is read once per page load: switching the relay or choosing a folder shows on the next load.
+- A page that only cares about booting keeps reading `ready` (or `data-ro-relay === 'ready'`); `state`
+  tells it which message to show. A page script may run after the attribute is set and miss the event:
+  read the attribute first, then listen.
+- 0.2.0 and older publish `ready|off` only and no `state` (`nogrf` was folded into `off`).
+- Today's `gate.js` (fork, `.github/pages-sites/shared/gate.js`) passes the attribute's value straight to
+  its `MESSAGES` table, which has no `nogrf` key: it needs a `nogrf` message (or to fold it into `off`)
+  before a 0.3.0 relay meets it, or it shows an empty message.
 
 ## Use
 

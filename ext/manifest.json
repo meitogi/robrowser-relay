@@ -45,6 +45,7 @@
 				"https://robrowser.suuuper.app/cyro.live/*"
 			],
 			"js": [
+				"state.js",
 				"content.js"
 			],
 			"run_at": "document_start"
