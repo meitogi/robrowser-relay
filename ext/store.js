@@ -1,22 +1,34 @@
 const out = document.getElementById('out');
+const progress = document.getElementById('progress');
+const drop = document.getElementById('drop');
+
+document.getElementById('version').textContent = `version ${browser.runtime.getManifest().version}`;
+// Opened by the background right after install.
+if (location.hash === '#welcome') {
+	document.getElementById('title').textContent = 'Welcome — one step left';
+}
 
 async function show(extra = '') {
-	const file = await dbGet('grf');
-	const root = (await dbGet('root')) || {};
-	const keys = Object.keys(root);
-	const bgm = keys.filter((k) => k.startsWith('bgm/')).length;
-	out.textContent =
-		(file ? `archive: ${file.name}, ${(file.size / 1e9).toFixed(2)} GB` : 'archive: none') +
-		`\nloose files: ${keys.length} (BGM: ${bgm})` +
-		`\npersisted storage: ${await navigator.storage.persisted()}` +
-		extra;
+	const { state, grf, root } = await showStatus();
+	showGrant();
+	let loose = 0;
+	let bgm = 0;
+	for (const key in root) {
+		loose++;
+		if (key.startsWith('bgm/')) {
+			bgm++;
+		}
+	}
+	out.textContent = grf ? `loose files: ${loose} (BGM: ${bgm})${extra}` : extra.trim();
+	document.getElementById('play').hidden = state !== 'ready';
 }
 
 const same = (a, b) => a && b && a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
 
 async function store(grf, root) {
 	await navigator.storage.persist();
-	out.textContent = 'storing…';
+	progress.hidden = false;
+	out.textContent = grf ? `Storing ${grf.name} (${gb(grf.size)})…` : 'Storing…';
 	const t0 = performance.now();
 	try {
 		if (grf) {
@@ -26,35 +38,102 @@ async function store(grf, root) {
 			await dbPut('root', root);
 		}
 	} catch (err) {
-		out.textContent = `store failed: ${err}`;
+		progress.hidden = true;
+		out.textContent = `Store failed: ${err}`;
 		return;
 	}
+	progress.hidden = true;
 	browser.runtime.sendMessage({ type: 'changed' });
-	await show(`\nstore took ${((performance.now() - t0) / 1000).toFixed(1)} s`);
+	await show(`\nstored in ${((performance.now() - t0) / 1000).toFixed(1)} s`);
 }
 
-// The folder: the top-level .grf (data.grf first) is the archive, every other file is a loose file
-// keyed by its lowercased path inside the folder. The archive already stored is not copied again.
-document.getElementById('folder').addEventListener('change', async (e) => {
-	const files = [...e.target.files];
-	if (!files.length) {
-		return;
-	}
-	const rel = (f) => f.webkitRelativePath.split('/').slice(1).join('/');
-	const grfs = files.filter((f) => /^[^/]+\.grf$/i.test(rel(f)));
-	const grf = grfs.find((f) => /^data\.grf$/i.test(rel(f))) || grfs[0] || null;
+// The folder, as [{ file, path }] with `path` inside it: the top-level .grf (data.grf first) is the
+// archive, every other file is a loose file keyed by its lowercased path. The archive already stored is
+// not copied again.
+async function storeFolder(entries) {
+	const grfs = entries.filter((e) => /^[^/]+\.grf$/i.test(e.path));
+	const top = grfs.find((e) => /^data\.grf$/i.test(e.path)) || grfs[0];
+	const grf = top ? top.file : null;
 	const root = {};
-	for (const f of files) {
-		if (f !== grf && !/\.grf$/i.test(f.name) && f.name !== '.DS_Store') {
-			root[rel(f).toLowerCase()] = f;
+	for (const e of entries) {
+		if (e.file !== grf && !/\.grf$/i.test(e.file.name) && e.file.name !== '.DS_Store') {
+			root[e.path.toLowerCase()] = e.file;
 		}
 	}
+	if (!grf && !(await dbGet('grf'))) {
+		out.textContent = 'No .grf at the top of this folder: choose the folder that holds data.grf.';
+		return;
+	}
 	await store(grf && !same(grf, await dbGet('grf')) ? grf : null, root);
+}
+
+document.getElementById('folder').addEventListener('change', (e) => {
+	const files = [...e.target.files];
+	if (files.length) {
+		storeFolder(files.map((file) => ({ file, path: file.webkitRelativePath.split('/').slice(1).join('/') })));
+	}
 });
 
 document.getElementById('grf').addEventListener('change', (e) => {
 	if (e.target.files[0]) {
 		store(e.target.files[0], null);
+	}
+});
+
+// Drag and drop: a folder goes through the same path as the picker, a lone .grf as the GRF picker.
+const readAll = (reader) =>
+	new Promise((resolve, reject) => {
+		const all = [];
+		const next = () =>
+			reader.readEntries((batch) => {
+				if (!batch.length) {
+					resolve(all);
+					return;
+				}
+				all.push(...batch);
+				next();
+			}, reject);
+		next();
+	});
+
+async function walk(dir, prefix, into) {
+	for (const entry of await readAll(dir.createReader())) {
+		const path = prefix + entry.name;
+		if (entry.isDirectory) {
+			await walk(entry, path + '/', into);
+		} else {
+			into.push({ file: await new Promise((resolve, reject) => entry.file(resolve, reject)), path });
+			if (into.length % 500 === 0) {
+				out.textContent = `Reading the folder… ${into.length} files`;
+			}
+		}
+	}
+	return into;
+}
+
+drop.addEventListener('dragover', (e) => {
+	e.preventDefault();
+	drop.classList.add('over');
+});
+drop.addEventListener('dragleave', () => drop.classList.remove('over'));
+drop.addEventListener('drop', async (e) => {
+	e.preventDefault();
+	drop.classList.remove('over');
+	const items = [...e.dataTransfer.items];
+	const entry = items.length === 1 ? items[0].webkitGetAsEntry() : null;
+	if (entry && entry.isDirectory) {
+		progress.hidden = false;
+		out.textContent = 'Reading the folder…';
+		try {
+			await storeFolder(await walk(entry, '', []));
+		} catch (err) {
+			out.textContent = `Reading the folder failed: ${err}`;
+		}
+		progress.hidden = true;
+	} else if (entry && /\.grf$/i.test(entry.name)) {
+		store(e.dataTransfer.files[0], null);
+	} else {
+		out.textContent = 'Drop the client folder itself (the one that holds data.grf).';
 	}
 });
 

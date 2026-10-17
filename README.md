@@ -41,8 +41,18 @@ The page shell works without the relay: drop the `importScripts` line from `sw.j
 - **CORS.** `cyro.live/api` sends no `Access-Control-Allow-Origin`. `webRequest.onHeadersReceived` adds it
   for the two game origins only (`https://cyro.localhost:6988`, `https://robrowser.suuuper.app`), while the
   relay is on.
-- **Popup.** Relay on/off, the stored folder, whether this tab uses it, the host permission button, the
-  folder page.
+- **Popup.** The relay's name and version, one status line with a mark — ✓ **Ready**, ⚠︎ **No client
+  folder**, ✗ **Relay off** (the [page contract](#page-contract) states) — and the stored archive's name,
+  size and loose-file count, then whether this tab uses the relay, the on/off switch, **Allow access to the
+  game pages and cyro.live** (only while that host access is missing) and **Choose the client folder…**
+  (highlighted while no folder is stored). Light and dark follow the system theme.
+- **Install page.** On a first install (`runtime.onInstalled`, `reason === 'install'`) the background opens
+  `store.html#welcome`: the same folder page, titled as a welcome step. It says in three lines what the relay
+  does, shows the same status line and access button as the popup, takes the client folder by drag and drop
+  or the picker (or only a `.grf`), shows progress while it reads and stores, then **Ready — open the game**
+  (`https://robrowser.suuuper.app/cyro.live/`) once the state is `ready`. Updates do not open it.
+- **Shared files.** `state.js` (the state), `ui.css` (the look, light and dark), `ui.js` (status line and
+  access button) are loaded by both the popup and the folder page.
 
 Measured in Firefox on the cyro archive (4.42 GB, v0x300, 290 305 entries): file table inflated in 95 ms
 and parsed in 23 ms (once per service-worker start), 1000 random entries at 1.75 ms average (worst 123 ms).
@@ -76,8 +86,9 @@ twice, in this order:
 
 ## Use
 
-1. Install (below), then click the icon → **Allow access to cyro.localhost and cyro.live** if shown.
-2. **Choose the client folder…** → `iRO_ver12.0-full-client-data/cyro`. Expect `loose files: 195 (BGM: 185)`.
+1. Install (below). The welcome page opens: **Allow access to the game pages and cyro.live** if shown.
+2. Drop `iRO_ver12.0-full-client-data/cyro` on the page, or click it to pick the folder (later: the icon →
+   **Choose the client folder…**). Expect `loose files: 195 (BGM: 185)` and ✓ **Ready**.
    Firefox's folder picker does not follow symlinks: a linked `BGM/` comes in empty, so copy it instead.
 3. Open `https://cyro.localhost:6988/api.html?app=ONLINE` with `wtf robrowser prod --local-grf` running,
    and reload once: the service worker caches the shell from its second load.

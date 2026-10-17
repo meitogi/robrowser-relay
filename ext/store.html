@@ -1,18 +1,58 @@
 <!doctype html>
-<html>
+<html lang="en">
 <head>
 <meta charset="utf-8">
 <title>roBrowser relay: client folder</title>
-<style>body { font: 14px system-ui; margin: 2em; } pre { background: #eee; padding: 1em; }</style>
+<link rel="stylesheet" href="ui.css">
+<style>
+	body { font-size: 14px; }
+	main { max-width: 560px; margin: 0 auto; padding: 32px 16px; }
+	main > * + * { margin-top: 16px; }
+	h1 { margin: 24px 0 0; font-size: 22px; }
+	.intro { margin: 8px 0 0; padding: 0; list-style: none; }
+	.intro li + li { margin-top: 4px; }
+	.drop { display: block; padding: 28px 16px; border: 2px dashed var(--line); border-radius: 10px; text-align: center; cursor: pointer; }
+	.drop:hover, .drop.over { border-color: var(--primary); }
+	.drop strong { display: block; font-size: 15px; }
+	.drop input { position: absolute; width: 1px; height: 1px; opacity: 0; }
+	.drop:focus-within { outline: 2px solid var(--primary); outline-offset: 2px; }
+	progress { width: 100%; }
+	#out { white-space: pre-line; font-size: 12px; }
+	.btn.big { padding: 10px 12px; font-size: 15px; }
+</style>
 </head>
 <body>
-<h1>Client folder</h1>
-<p>The folder grf-serve would serve: <code>data.grf</code> plus its loose files (<code>BGM/</code>, <code>AI/</code>…).
-Loose files win over the archive, as in grf-serve.</p>
-<p><input type="file" id="folder" webkitdirectory></p>
-<p>Or only the GRF: <input type="file" id="grf" accept=".grf"></p>
-<pre id="out">…</pre>
+<main>
+	<div class="brand">
+		<img src="icons/icon-48.png" alt="">
+		<div><strong>roBrowser relay</strong><small id="version"></small></div>
+	</div>
+	<section>
+		<h1 id="title">Client folder</h1>
+		<ul class="intro">
+			<li>Plays roBrowser on <b>robrowser.suuuper.app/cyro.live</b> with your own Ragnarok client files.</li>
+			<li>You give it your client folder once (<code>data.grf</code>, <code>BGM/</code>, <code>AI/</code>…); it stays in Firefox, nothing is uploaded.</li>
+			<li>While the relay is on, the game page reads its files from that folder and talks to the cyro.live API directly.</li>
+		</ul>
+	</section>
+	<div class="status" id="status">
+		<span class="mark" aria-hidden="true"></span>
+		<div><strong></strong><span class="detail">…</span></div>
+	</div>
+	<button class="btn primary" id="grant" hidden>Allow access to the game pages and cyro.live</button>
+	<label class="drop" id="drop">
+		<strong>Drop your client folder here</strong>
+		<span class="muted">or click to choose it — the folder that holds <code>data.grf</code>. Loose files win over the archive.</span>
+		<input type="file" id="folder" webkitdirectory>
+	</label>
+	<p class="muted">Or only the GRF: <input type="file" id="grf" accept=".grf"></p>
+	<progress id="progress" hidden></progress>
+	<p class="muted" id="out"></p>
+	<a class="btn primary big" id="play" href="https://robrowser.suuuper.app/cyro.live/" hidden>Ready — open the game</a>
+</main>
 <script src="db.js"></script>
+<script src="state.js"></script>
+<script src="ui.js"></script>
 <script src="store.js"></script>
 </body>
 </html>

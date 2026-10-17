@@ -1,5 +1,12 @@
 const enabled = async () => (await dbGet('enabled')) !== false;
 
+// First install: the folder page, on its welcome step.
+browser.runtime.onInstalled.addListener(({ reason }) => {
+	if (reason === 'install') {
+		browser.tabs.create({ url: browser.runtime.getURL('store.html#welcome') });
+	}
+});
+
 // Clears the "taken" badge on every tab (the relay was switched off or the GRF replaced).
 async function clearBadges() {
 	for (const tab of await browser.tabs.query({ url: ['https://cyro.localhost/*', 'https://robrowser.suuuper.app/*'] })) {
