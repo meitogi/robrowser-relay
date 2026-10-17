@@ -26,8 +26,11 @@ async function showStatus() {
 }
 
 // Without host access the content script never runs on the game page: the button shows until it is granted.
+// Returns whether access is granted.
 async function showGrant() {
-	document.getElementById('grant').hidden = await browser.permissions.contains(ORIGINS);
+	const granted = await browser.permissions.contains(ORIGINS);
+	document.getElementById('grant').hidden = granted;
+	return granted;
 }
 
 document.getElementById('grant').addEventListener('click', async () => {

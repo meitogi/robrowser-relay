@@ -6,8 +6,8 @@ document.getElementById('version').textContent = `version ${browser.runtime.getM
 async function show() {
 	const { enabled, grf } = await showStatus();
 	toggle.checked = enabled;
-	store.classList.toggle('primary', !grf);
-	showGrant();
+	// One highlighted button at a time: host access first, then the folder.
+	store.classList.toggle('primary', (await showGrant()) && !grf);
 	// The badge of the active tab says whether its page took the GRF.
 	const [tab] = await browser.tabs.query({ active: true, currentWindow: true });
 	const badge = tab ? await browser.action.getBadgeText({ tabId: tab.id }) : '';
