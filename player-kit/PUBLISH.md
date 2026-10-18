@@ -24,7 +24,8 @@ Free each month ([pricing](https://developers.cloudflare.com/r2/pricing/)):
 | Egress to the Internet | **free** | no cost per download |
 
 That is why the script keeps one large object, `grf-offline-cyro.zip`, replaced at each publish (plus
-`guide/START-HERE.html` and `guide/README.txt`, about 1 MB). The older `cyro-client.zip` is deleted from the
+`guide/START-HERE.html`, `guide/README.txt` and the extension alone, `extensions/roBrowser-relay-firefox.xpi`
+and `extensions/roBrowser-relay-chrome.zip`, about 1 MB). The older `cyro-client.zip` is deleted from the
 bucket after the kit's first verified upload.
 
 ## 2. Create the bucket
@@ -115,9 +116,11 @@ Without `wtf`: `KIT_GAME_DIR=<client folder> bash player-kit/publish.sh`, from t
 What it does: rebuilds the extension, checks that the signed xpi of its version exists (else
 `./sign.sh --channel=unlisted`), renders the guides (store links from `store-links.env`), zips the kit into
 `dist/grf-offline-cyro-<date>.zip`, fetches rclone (once, SHA256 checked), uploads the zip as
-`grf-offline-cyro.zip`, compares the local and remote md5, uploads the online guide, deletes
-`cyro-client.zip` if it is still there, then the local zip (`--keep-zip` keeps it). It ends by printing the
-two links and checking that they answer 200.
+`grf-offline-cyro.zip` (after the extension alone, so its links answer while the kit uploads), compares the
+local and remote md5, uploads the online guide, deletes `cyro-client.zip` if it is still there, then the
+local zip (`--keep-zip` keeps it). It ends by checking that the players' links answer 200 and printing the
+announce, `dist/DISCORD.md` (from `DISCORD.template.md`: the store pages replace the extension's files once
+they are in `store-links.env`).
 
 `--build-only` does everything up to the tested zip and uploads nothing (no network needed).
 

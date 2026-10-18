@@ -69,3 +69,31 @@ test('the guides name no private-beta page', () => {
 		assert.doesNotMatch(text, /native-plugin-manager/);
 	}
 });
+
+test('the game pages: cyro.live first, then the two robrowser.suuuper.app pages', () => {
+	for (const text of [both({}).html, both({}).txt]) {
+		const rb2 = text.indexOf('https://cyro.live/rb2/');
+		assert.ok(rb2 > 0 && rb2 < text.indexOf('https://robrowser.suuuper.app/upstream/cyro.live/'));
+		assert.ok(text.indexOf('https://robrowser.suuuper.app/upstream/cyro.live/') < text.indexOf('https://robrowser.suuuper.app/cyro/cyro.live/'));
+	}
+});
+
+test('online copy: the extension alone, so it installs while the kit downloads', () => {
+	const { html } = both({});
+	assert.match(html, /class="online"[\s\S]*href="\.\.\/grf-offline-cyro\.zip"/);
+	assert.match(html, /href="\.\.\/extensions\/roBrowser-relay-firefox\.xpi"/);
+	assert.match(html, /href="\.\.\/extensions\/roBrowser-relay-chrome\.zip"/);
+});
+
+test('the announce: four links, the store pages once they exist', () => {
+	const discord = readFileSync(new URL('../player-kit/DISCORD.template.md', import.meta.url), 'utf8');
+	const kit = render(discord, kitVars({}, '9.9.9', '5.7 GB', 'https://files.example'));
+	assert.doesNotMatch(kit, /\{\{|\}\}/);
+	for (const link of ['/grf-offline-cyro.zip', '/extensions/roBrowser-relay-firefox.xpi', '/extensions/roBrowser-relay-chrome.zip', '/guide/START-HERE.html']) {
+		assert.ok(kit.includes(`https://files.example${link}`), link);
+	}
+	assert.ok(kit.indexOf('https://cyro.live/rb2/') < kit.indexOf('https://robrowser.suuuper.app/upstream/cyro.live/'));
+	const stores = render(discord, kitVars({ FIREFOX_STORE_URL: FF, CHROME_STORE_URL: CWS }, '9.9.9', '5.7 GB', 'https://files.example'));
+	assert.ok(stores.includes(FF) && stores.includes(CWS));
+	assert.doesNotMatch(stores, /\/extensions\/roBrowser-relay-/);
+});

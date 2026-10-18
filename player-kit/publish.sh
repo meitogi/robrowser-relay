@@ -14,7 +14,9 @@
 # game/ is staged as a symlink (zip follows it), so the 5.7 GB of game files are not copied.
 #
 # Uploaded as grf-offline-cyro.zip, plus guide/START-HERE.html and guide/README.txt, so a link shows the
-# guide before the download (its download button is ../grf-offline-cyro.zip). One zip only : R2's free
+# guide before the download (its download button is ../grf-offline-cyro.zip), and the extension alone,
+# extensions/roBrowser-relay-firefox.xpi and extensions/roBrowser-relay-chrome.zip, so a player installs it
+# while the kit downloads. The announce, with all those links, ends in dist/DISCORD.md. One zip only : R2's free
 # tier is 10 GB. The older cyro-client.zip is deleted from the bucket once the kit is verified.
 #
 # The zip is built in dist/. --build-only : build and test it, no upload ; needs no network. --keep-zip :
@@ -128,37 +130,58 @@ chmod -R u=rwX,go=rX "$STAGE/extensions" "$STAGE/START-HERE.html" "$STAGE/README
 ln -s "$GAME" "$STAGE/game"
 
 # ── zip ─────────────────────────────────────────────────────────────────────
-# Stored, not deflated : the GRF and the mp3s are already compressed. Rebuilt every run : the guides
-# or the extension may have changed since the last one.
-ZIP="$REL/$KIT-$(date +%Y-%m-%d).zip"
-rm -f "$ZIP" "$ZIP.part"
-echo "[publish] zipping the kit → $ZIP"
-if command -v zip >/dev/null 2>&1; then
-	run_with_progress zip "$GAME_BYTES" "$ZIP.part" sh -c 'cd "$1" && zip -q -r -0 "$2" START-HERE.html README.txt extensions game -x "*.DS_Store" "*.amo-upload-uuid"' _ "$STAGE" "$ZIP.part"
-else
-	# No zip command (a slim container) : the same archive (stored, links followed, same exclusions) from Python.
-	run_with_progress zip "$GAME_BYTES" "$ZIP.part" python3 -c '
+# mkzip <out> <dir> <entry…> : a stored zip (the GRF and the mp3s are already compressed) of the entries
+# of <dir>, links followed, without Finder's and web-ext's droppings.
+mkzip() {
+	local out=$1 dir=$2
+	shift 2
+	if command -v zip >/dev/null 2>&1; then
+		(cd "$dir" && zip -q -r -0 "$out" "$@" -x "*.DS_Store" "*.amo-upload-uuid")
+	else
+		# No zip command (a slim container) : the same archive from Python.
+		python3 -c '
 import os, sys, zipfile
-stage, out = sys.argv[1:3]
+out, root, tops = sys.argv[1], sys.argv[2], sys.argv[3:]
 with zipfile.ZipFile(out, "w", zipfile.ZIP_STORED, allowZip64=True) as z:
-    for top in ("START-HERE.html", "README.txt", "extensions", "game"):
-        path = os.path.join(stage, top)
-        walk = os.walk(path, followlinks=True) if os.path.isdir(path) else [(stage, [], [top])]
+    for top in tops:
+        path = os.path.join(root, top)
+        walk = os.walk(path, followlinks=True) if os.path.isdir(path) else [(root, [], [top])]
         for d, _, files in walk:
             for f in sorted(files):
                 if f not in (".DS_Store", ".amo-upload-uuid"):
                     full = os.path.join(d, f)
-                    z.write(full, os.path.relpath(full, stage))
-' "$STAGE" "$ZIP.part"
-fi
+                    z.write(full, os.path.relpath(full, root))
+' "$out" "$dir" "$@"
+	fi
+}
+
+# The extension alone, so a player installs it while the kit downloads : the xpi, and the Chrome
+# folder zipped under the name the guide gives it. Stable names : the links do not change.
+ALONE="$REL/extensions"
+rm -rf "$ALONE" "$REL/alone"
+mkdir -p "$ALONE" "$REL/alone"
+cp "$STAGE/extensions/firefox/roBrowser-relay-$VERSION.xpi" "$ALONE/roBrowser-relay-firefox.xpi"
+cp -R "$STAGE/extensions/chrome" "$REL/alone/roBrowser-relay-chrome"
+mkzip "$ALONE/roBrowser-relay-chrome.zip" "$REL/alone" roBrowser-relay-chrome
+rm -rf "$REL/alone"
+echo "[publish] $ALONE/ — roBrowser-relay-firefox.xpi, roBrowser-relay-chrome.zip"
+
+# The kit. Rebuilt every run : the guides or the extension may have changed since the last one.
+ZIP="$REL/$KIT-$(date +%Y-%m-%d).zip"
+rm -f "$ZIP" "$ZIP.part"
+echo "[publish] zipping the kit → $ZIP"
+run_with_progress zip "$GAME_BYTES" "$ZIP.part" mkzip "$ZIP.part" "$STAGE" START-HERE.html README.txt extensions game
 mv "$ZIP.part" "$ZIP"
 rm -rf "$STAGE"
 run_with_progress "integrity test" 0 "" sh -c 'unzip -tq "$1" >/dev/null' _ "$ZIP" || { echo "✗ $ZIP fails its own integrity test" >&2; exit 2; }
 echo "[publish] $ZIP — $(du -h "$ZIP" | awk '{print $1}'), integrity ok"
 
+node "$RELAY/player-kit/render.mjs" "$REL" --size "$SIZE" --discord "$R2_PUBLIC_URL" >/dev/null
+
 if [ "$BUILD_ONLY" = 1 ]; then
 	unzip -Z1 "$ZIP" | awk -F/ '{ print ($2 == "" || $1 != "game") ? $0 : $1 "/" $2 }' | awk '!seen[$0]++' | sed 's/^/  /'
-	echo "[publish] --build-only : nothing uploaded, the zip is kept"
+	echo "[publish] --build-only : nothing uploaded, the zip is kept ; the announce, once published :"
+	sed 's/^/  /' "$REL/DISCORD.md"
 	exit 0
 fi
 
@@ -250,6 +273,12 @@ if ! PRE=$("$RCLONE" lsf "r2:$BUCKET" --max-depth 1 --low-level-retries 1 --retr
 fi
 
 # ── upload, verify ──────────────────────────────────────────────────────────
+# The extension alone first : a few seconds, and its links answer while the kit uploads. Firefox installs
+# an xpi from a link only when it comes as application/x-xpinstall.
+"$RCLONE" copyto "$ALONE/roBrowser-relay-firefox.xpi" "r2:$BUCKET/extensions/roBrowser-relay-firefox.xpi" --header-upload "Content-Type: application/x-xpinstall"
+"$RCLONE" copyto "$ALONE/roBrowser-relay-chrome.zip" "r2:$BUCKET/extensions/roBrowser-relay-chrome.zip" --header-upload "Content-Type: application/zip"
+echo "[publish] r2:$BUCKET/extensions/ — roBrowser-relay-firefox.xpi, roBrowser-relay-chrome.zip"
+
 "$RCLONE" copyto "$ZIP" "r2:$BUCKET/$KIT.zip" --progress --s3-chunk-size 64M --s3-upload-concurrency 4
 MD5_OUT=$(mktemp)
 run_with_progress "md5 of the local zip" 0 "" sh -c '"$1" md5sum "$2" > "$3"' _ "$RCLONE" "$ZIP" "$MD5_OUT"
@@ -282,9 +311,11 @@ fi
 
 # ── the players' links ──────────────────────────────────────────────────────
 echo "[publish] players' links :"
-for path in guide/START-HERE.html "$KIT.zip"; do
+for path in guide/START-HERE.html "$KIT.zip" extensions/roBrowser-relay-firefox.xpi extensions/roBrowser-relay-chrome.zip; do
 	code=$(curl -s -o /dev/null -I -w '%{http_code}' "$R2_PUBLIC_URL/$path" || true)
 	if [ "$code" = 200 ]; then mark='✓'; else mark="✗ HTTP $code"; fi
 	echo "  $mark $R2_PUBLIC_URL/$path"
 done
 echo "  (public address : R2_PUBLIC_URL, at the top of player-kit/publish.sh)"
+echo "[publish] the announce, $REL/DISCORD.md :"
+sed 's/^/  /' "$REL/DISCORD.md"

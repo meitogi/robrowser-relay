@@ -20,13 +20,13 @@ The kit holds:
   extensions/
     firefox/          the extension for Firefox
     chrome/           the extension for Chrome, Edge, Brave, Opera
-    tampermonkey/     the cyro.live patch (optional, step 6)
+    tampermonkey/     the cyro.live patch (step 4)
   game/               the game files: data.grf, BGM/, AI/, System/
 
 Extract the whole zip into a folder you will keep, for example
 Documents\grf-offline-cyro. Do not work from inside the zip. Keep about 12 GB
 free while you install; once the game is ready you can delete the zip and
-game/ (step 7).
+game/ (step 6).
 
 
 2. INSTALL THE EXTENSION
@@ -78,7 +78,8 @@ Either way, a "Welcome - one step left" tab opens.
   c. If the browser asks "Upload files to this site?", answer yes: the "site"
      is the extension's own page, nothing leaves your computer.
   d. Wait about a minute. It shows "Ready".
-  e. Click "Ready - open the game".
+  e. Go on with step 4. (The green "Ready - open the game" button opens the
+     robrowser.suuuper.app page of step 4.)
 
 Later: the extension's icon in the toolbar > "Choose the client folder...".
 
@@ -86,14 +87,33 @@ Later: the extension's icon in the toolbar > "Choose the client folder...".
 4. OPEN THE GAME
 ----------------
 
-Any of these, then log in with your cyro.live account as usual:
+Log in with your cyro.live account as usual.
+
+ON CYRO.LIVE: https://cyro.live/rb2/
+cyro.live's own page. It needs the cyro.live patch, once, so that it reads
+your files:
+
+  a. Install Tampermonkey for your browser: https://www.tampermonkey.net/
+  b. Chrome, Edge, Brave, Opera: chrome://extensions > Tampermonkey >
+     "Details" > turn on "Allow User Scripts" (older versions: "Developer
+     mode", as in step 2).
+  c. Open
+     https://raw.githubusercontent.com/meitogi/robrowser-relay/main/cyro-live-patch/robrowser-relay-cyro.user.js
+     Tampermonkey shows it > "Install".
+  d. Open https://cyro.live/rb2/ (reload it if it was open) and log in. The
+     popup shows "cyro.live patch".
+
+  The link does not open? Open
+  extensions/tampermonkey/cyro-live-patch.user.js in a text editor, copy
+  everything; Tampermonkey's icon > "Create a new script..." > paste over
+  everything > File > Save.
+
+OR ON ROBROWSER.SUUUPER.APP, NO PATCH NEEDED
 
   https://robrowser.suuuper.app/upstream/cyro.live/
-      Start here. roBrowser with the latest fixes.
+      roBrowser with the latest fixes.
   https://robrowser.suuuper.app/cyro/cyro.live/
       The client cyro.live serves on its own site, from this page.
-  https://cyro.live/rb2/
-      cyro.live's own page. Needs the patch of step 6 first.
 
 
 5. CHECK THAT IT WORKS
@@ -106,28 +126,7 @@ On the game page the extension's icon shows GRF. Click it, you should read:
   No game file from the server  everything came from your computer
 
 
-6. OPTIONAL: CYRO.LIVE'S OWN PAGE
----------------------------------
-
-Only for https://cyro.live/rb2/ - the robrowser.suuuper.app pages do not
-need this.
-
-  a. Install Tampermonkey for your browser: https://www.tampermonkey.net/
-  b. Chrome, Edge, Brave, Opera: chrome://extensions > Tampermonkey >
-     "Details" > turn on "Allow User Scripts" (older versions: "Developer
-     mode", as in step 2).
-  c. Open
-     https://raw.githubusercontent.com/meitogi/robrowser-relay/main/cyro-live-patch/robrowser-relay-cyro.user.js
-     Tampermonkey shows it > "Install".
-  d. Reload https://cyro.live/rb2/ - the popup shows "cyro.live patch".
-
-  The link does not open? Open
-  extensions/tampermonkey/cyro-live-patch.user.js in a text editor, copy
-  everything; Tampermonkey's icon > "Create a new script..." > paste over
-  everything > File > Save.
-
-
-7. FREE THE DISK SPACE
+6. FREE THE DISK SPACE
 ----------------------
 
 Once it says "Ready", the browser keeps its own copy of the game files: you
@@ -160,7 +159,7 @@ SOMETHING IS WRONG?
     game folder lacks them. A newer kit has them.
 
 "cyro.live patch not installed"
-    Only matters on cyro.live/rb2: step 6.
+    Only matters on cyro.live/rb2: the patch, in step 4.
 
 The extension vanished or shows an error (Chrome, Edge...)
     extensions/chrome was moved or deleted. Put it back, or load it again

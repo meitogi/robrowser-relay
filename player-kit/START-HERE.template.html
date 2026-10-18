@@ -49,6 +49,10 @@
 	.crop { position: relative; max-width: 600px; overflow: hidden; border: 1px solid var(--line); border-radius: 8px; }
 	.crop img { position: absolute; top: 0; left: calc(-100% * 340 / 600); width: calc(100% * 1280 / 600); max-width: none; border: 0; border-radius: 0; }
 	td a { overflow-wrap: anywhere; }
+	/* The online copy (served) and the kit's copy (opened from disk) differ in a few lines. */
+	.online { display: none; }
+	.is-online .online { display: revert; }
+	.is-online .offline { display: none; }
 	figcaption { font-size: 14px; color: var(--muted); margin-top: 4px; }
 	.btn { display: inline-block; padding: 10px 16px; border-radius: 8px; background: var(--primary); color: var(--bg); font-weight: 600; text-decoration: none; }
 	.tree { white-space: pre; font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; background: var(--code); padding: 12px; border-radius: 8px; overflow-x: auto; }
@@ -63,11 +67,12 @@ the files on your computer instead of downloading them again from the server eve
 uploaded; your files stay in your browser.</p>
 <p>About 10 minutes, once. Works in Firefox, Chrome, Edge, Brave and Opera, on a computer (not on a phone).</p>
 
-<section id="download" hidden>
-	<h2><span class="n">0</span>Download the kit</h2>
+<section class="online">
+	<h2><span class="n">0</span>Start the download</h2>
 	<p><a class="btn" href="../grf-offline-cyro.zip">Download grf-offline-cyro.zip</a> ({{SIZE}})</p>
-	<p>Then extract it (right click → <b>Extract All…</b> on Windows, double click on macOS) and open
-	<code>START-HERE.html</code> inside: it is this same guide.</p>
+	<p>It takes a while. <b>Do not wait for it: install the extension now (step 2)</b>, it does not need
+	the zip. Once the download is done, extract it (right click → <b>Extract All…</b> on Windows, double
+	click on macOS) and go on with step 3.</p>
 </section>
 
 <h2><span class="n">1</span>Before you start</h2>
@@ -77,12 +82,12 @@ README.txt         the same guide, as plain text
 extensions/
   firefox/         the extension for Firefox
   chrome/          for Chrome, Edge, Brave, Opera
-  tampermonkey/    the cyro.live patch (step 6)
+  tampermonkey/    the cyro.live patch (step 4)
 game/              the game files</div>
 <div class="box warn">
 	<p><b>Extract the whole zip into a folder you will keep</b>, for example <code>Documents\grf-offline-cyro</code>.
 	Do not work from inside the zip. Keep about 12 GB free while you install; once the game is
-	ready you can delete the zip and <code>game/</code> (step 7).</p>
+	ready you can delete the zip and <code>game/</code> (step 6).</p>
 </div>
 
 <h2><span class="n">2</span>Install the extension</h2>
@@ -96,19 +101,24 @@ game/              the game files</div>
 			<li>Open <a href="{{FIREFOX_STORE_URL}}">the roBrowser relay page on Firefox Add-ons</a>.</li>
 			<li>Click <b>Add to Firefox</b>, then <b>Add</b>.</li>
 		</ol>
-		<p>A <b>Welcome — one step left</b> tab opens: go to step 3.</p>
+		<p>A <b>Welcome — one step left</b> tab opens: step 3 gives it the <code>game</code> folder of the kit.</p>
 		<details>
-			<summary>Without the store (from the kit)</summary>
+			<summary>Without the store</summary>
 			<div>
 {{/firefoxStore}}
-		<ol>
+		<ol class="online">
+			<li>Click <a href="../extensions/roBrowser-relay-firefox.xpi">Install roBrowser relay for Firefox</a>.</li>
+			<li>Firefox says it prevented this site from asking you to install software → <b>Continue to Installation</b>.</li>
+			<li>Firefox asks <b>Add roBrowser relay?</b> → click <b>Add</b>.</li>
+		</ol>
+		<ol class="offline">
 			<li>In Firefox, open the menu <b>≡</b> → <b>Add-ons and themes</b> (or type <code>about:addons</code> in the address bar).</li>
 			<li>Click the gear <b>⚙</b> → <b>Install Add-on From File…</b></li>
 			<li>Pick <code>extensions/firefox/{{XPI}}</code>.</li>
 			<li>Firefox asks <b>Add roBrowser relay?</b> → click <b>Add</b>.</li>
 		</ol>
-		<p>Dropping the <code>.xpi</code> file on a Firefox window does the same. A <b>Welcome — one step left</b>
-		tab opens: go to step 3.</p>
+		<p class="offline">Dropping the <code>.xpi</code> file on a Firefox window does the same.</p>
+		<p>A <b>Welcome — one step left</b> tab opens: step 3 gives it the <code>game</code> folder of the kit.</p>
 {{#firefoxStore}}
 			</div>
 		</details>
@@ -124,23 +134,25 @@ game/              the game files</div>
 			<li>Open <a href="{{CHROME_STORE_URL}}">the roBrowser relay page on the Chrome Web Store</a>.</li>
 			<li>Click <b>Add to Chrome</b>, then <b>Add extension</b>. (Edge: <b>Allow extensions from other stores</b> first, if it asks.)</li>
 		</ol>
-		<p>A <b>Welcome — one step left</b> tab opens: go to step 3.</p>
+		<p>A <b>Welcome — one step left</b> tab opens: step 3 gives it the <code>game</code> folder of the kit.</p>
 		<details>
-			<summary>Without the store (from the kit)</summary>
+			<summary>Without the store</summary>
 			<div>
 {{/chromeStore}}
 		<ol>
+			<li class="online">Download <a href="../extensions/roBrowser-relay-chrome.zip">roBrowser-relay-chrome.zip</a> and extract it
+			into a folder you will keep, for example <code>Documents</code>: you get a folder <code>roBrowser-relay-chrome</code>.</li>
 			<li>Type in the address bar: <code>chrome://extensions</code>
 			(Edge: <code>edge://extensions</code>, Brave: <code>brave://extensions</code>, Opera: <code>opera://extensions</code>).</li>
 			<li>Turn on <b>Developer mode</b> (a switch at the top right; in Edge, on the left).</li>
 			<li>Click <b>Load unpacked</b>.</li>
-			<li>Select the folder <code>extensions/chrome</code> (the one that holds <code>manifest.json</code>) → <b>Select Folder</b>.</li>
+			<li>Select the folder <code class="offline">extensions/chrome</code><code class="online">roBrowser-relay-chrome</code> (the one that holds <code>manifest.json</code>) → <b>Select Folder</b>.</li>
 			<li>Pin it: the puzzle icon in the toolbar → the pin next to <b>roBrowser relay</b>.</li>
 		</ol>
-		<p>A <b>Welcome — one step left</b> tab opens: go to step 3.</p>
+		<p>A <b>Welcome — one step left</b> tab opens: step 3 gives it the <code>game</code> folder of the kit.</p>
 		<div class="box warn">
 			<p>The browser runs the extension <b>from that folder</b>. Do not move, rename or delete
-			<code>extensions/chrome</code> afterwards, or the extension stops and you start over.</p>
+			<code class="offline">extensions/chrome</code><code class="online">roBrowser-relay-chrome</code> afterwards, or the extension stops and you start over.</p>
 		</div>
 {{#chromeStore}}
 			</div>
@@ -161,7 +173,7 @@ game/              the game files</div>
 	<li>If the browser asks <b>Upload files to this site?</b>, answer yes: the "site" is the extension's own
 	page, nothing leaves your computer.</li>
 	<li>Wait while it copies the files into the browser (about a minute). It shows <span class="ok">✓ Ready</span>.</li>
-	<li>Click <b>Ready — open the game</b>.</li>
+	<li>Go on with step 4. (The green <b>Ready — open the game</b> button opens the robrowser.suuuper.app page of step 4.)</li>
 </ol>
 <figure>
 	<div class="crop" style="aspect-ratio: 600 / 700"><img src="{{img:2-folder-ready}}" alt="The same page showing Ready, data.grf, and a green button Ready — open the game" width="1280" height="800"></div>
@@ -170,36 +182,17 @@ game/              the game files</div>
 <p>To come back to this page later: click the extension's icon in the toolbar → <b>Choose the client folder…</b></p>
 
 <h2><span class="n">4</span>Open the game</h2>
-<p>Any of these pages, then log in with your cyro.live account as usual:</p>
-<div class="wrap"><table>
-	<tr><th>Page</th><th>What it is</th></tr>
-	<tr><td><a href="https://robrowser.suuuper.app/upstream/cyro.live/">robrowser.suuuper.app/upstream/cyro.live</a></td><td><b>Start here.</b> roBrowser with the latest fixes.</td></tr>
-	<tr><td><a href="https://robrowser.suuuper.app/cyro/cyro.live/">robrowser.suuuper.app/cyro/cyro.live</a></td><td>The client cyro.live serves on its own site, from this page.</td></tr>
-	<tr><td><a href="https://cyro.live/rb2/">cyro.live/rb2</a></td><td>cyro.live's own page. Needs the patch of step 6 first.</td></tr>
-</table></div>
-<p>Bookmark the one you use.</p>
+<p>Log in with your cyro.live account as usual.</p>
 
-<h2><span class="n">5</span>Check that it works</h2>
-<p>On the game page, the extension's icon in the toolbar shows <b>GRF</b>. Click it:</p>
-<figure>
-	<img src="{{img:3-cyro-checks}}" alt="The game's login screen, and the extension's popup with Ready, The page took your folder, No game file from the server" width="1280" height="800">
-	<figcaption>All green: the game reads your files.</figcaption>
-</figure>
-<ul>
-	<li><span class="ok">✓ Ready</span> — the extension holds your game folder.</li>
-	<li><span class="ok">✓ The page took your folder</span> — this page uses it.</li>
-	<li><span class="ok">✓ No game file from the server</span> — everything came from your computer.</li>
-</ul>
-
-<h2><span class="n">6</span>Optional: cyro.live's own page</h2>
-<p>Only for <a href="https://cyro.live/rb2/">cyro.live/rb2</a>. The two robrowser.suuuper.app pages do not need this.</p>
+<h3>On cyro.live: <a href="https://cyro.live/rb2/">cyro.live/rb2</a></h3>
+<p>cyro.live's own page. It needs the <b>cyro.live patch</b>, once, so that it reads your files:</p>
 <ol>
 	<li>Install <a href="https://www.tampermonkey.net/">Tampermonkey</a> for your browser.</li>
 	<li>Chrome, Edge, Brave, Opera: <code>chrome://extensions</code> → Tampermonkey → <b>Details</b> → turn on
 	<b>Allow User Scripts</b> (older versions: <b>Developer mode</b>, as in step 2).</li>
 	<li>Open <a href="https://raw.githubusercontent.com/meitogi/robrowser-relay/main/cyro-live-patch/robrowser-relay-cyro.user.js">the cyro.live patch</a>:
 	Tampermonkey shows it → <b>Install</b>. It keeps itself up to date.</li>
-	<li>Reload <a href="https://cyro.live/rb2/">cyro.live/rb2</a>. The popup now shows <span class="ok">✓ cyro.live patch</span>.</li>
+	<li>Open <a href="https://cyro.live/rb2/">cyro.live/rb2</a> (reload it if it was open) and log in. The popup shows <span class="ok">✓ cyro.live patch</span>.</li>
 </ol>
 <details>
 	<summary>The link does not open? Install it from the kit</summary>
@@ -216,7 +209,28 @@ game/              the game files</div>
 	<figcaption>Without the patch, the popup says so and offers <b>Install the cyro.live patch</b>.</figcaption>
 </figure>
 
-<h2><span class="n">7</span>Free the disk space</h2>
+
+<h3>Or on robrowser.suuuper.app, no patch needed</h3>
+<div class="wrap"><table>
+	<tr><th>Page</th><th>What it is</th></tr>
+	<tr><td><a href="https://robrowser.suuuper.app/upstream/cyro.live/">robrowser.suuuper.app/upstream/cyro.live</a></td><td>roBrowser with the latest fixes.</td></tr>
+	<tr><td><a href="https://robrowser.suuuper.app/cyro/cyro.live/">robrowser.suuuper.app/cyro/cyro.live</a></td><td>The client cyro.live serves on its own site, from this page.</td></tr>
+</table></div>
+<p>Bookmark the one you use.</p>
+
+<h2><span class="n">5</span>Check that it works</h2>
+<p>On the game page, the extension's icon in the toolbar shows <b>GRF</b>. Click it:</p>
+<figure>
+	<img src="{{img:3-cyro-checks}}" alt="The game's login screen, and the extension's popup with Ready, The page took your folder, No game file from the server" width="1280" height="800">
+	<figcaption>All green: the game reads your files.</figcaption>
+</figure>
+<ul>
+	<li><span class="ok">✓ Ready</span> — the extension holds your game folder.</li>
+	<li><span class="ok">✓ The page took your folder</span> — this page uses it.</li>
+	<li><span class="ok">✓ No game file from the server</span> — everything came from your computer.</li>
+</ul>
+
+<h2><span class="n">6</span>Free the disk space</h2>
 <p>Once you see <span class="ok">✓ Ready</span>, the browser keeps its own copy of the game files. You can delete
 the zip and the <code>game</code> folder.</p>
 <p>Installed from the kit on Chrome, Edge, Brave or Opera? <b>Keep <code>extensions/chrome</code></b>: the browser runs the extension from it.</p>
@@ -229,7 +243,7 @@ the zip and the <code>game</code> folder.</p>
 	<tr><td>"The service worker does not control this page…"</td><td>Reload normally (<kbd>F5</kbd>, <kbd>Ctrl</kbd>+<kbd>R</kbd>), not a forced reload. Private windows do not work.</td></tr>
 	<tr><td>◷ "The page has not taken your folder: reload it"</td><td>Reload the page.</td></tr>
 	<tr><td><span class="wn">⚠︎</span> "N game files from the server"</td><td>The game still plays; those files came from the server because your <code>game</code> folder lacks them. A newer kit has them.</td></tr>
-	<tr><td>✗ "cyro.live patch not installed"</td><td>Only matters on cyro.live/rb2: step 6.</td></tr>
+	<tr><td>✗ "cyro.live patch not installed"</td><td>Only matters on cyro.live/rb2: the patch, in step 4.</td></tr>
 	<tr><td>The extension vanished or shows an error (Chrome, Edge…)</td><td><code>extensions/chrome</code> was moved or deleted. Put it back, or load it again from its new place (step 2), then give the game folder again (step 3).</td></tr>
 	<tr><td>No toolbar icon</td><td>Pin it: puzzle icon (Chrome) or <b>≡</b> → Add-ons (Firefox).</td></tr>
 </table></div>
@@ -248,8 +262,8 @@ Bugs and questions: <a href="https://github.com/meitogi/robrowser-relay/issues">
 
 </main>
 <script>
-	// The online copy offers the download; the copy inside the kit does not need it.
-	if (location.protocol !== 'file:') document.getElementById('download').hidden = false;
+	// The online copy offers the downloads; the copy inside the kit points at its own folders.
+	if (location.protocol !== 'file:') document.documentElement.classList.add('is-online');
 	// Open the part for this browser.
 	document.getElementById(/firefox/i.test(navigator.userAgent) ? 'firefox' : 'chrome').open = true;
 </script>
