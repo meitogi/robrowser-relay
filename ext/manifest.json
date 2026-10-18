@@ -1,7 +1,7 @@
 {
 	"manifest_version": 3,
 	"name": "roBrowser relay",
-	"version": "0.3.1",
+	"version": "0.3.2",
 	"description": "Private beta. Hands your own game client folder (GRF + BGM) to the roBrowser game pages on robrowser.suuuper.app, and lets them call the cyro.live API directly.",
 	"browser_specific_settings": {
 		"gecko": {
