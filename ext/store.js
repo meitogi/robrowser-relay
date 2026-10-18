@@ -83,7 +83,8 @@ document.getElementById('grf').addEventListener('change', (e) => {
 	}
 });
 
-// Drag and drop: a folder goes through the same path as the picker, a lone .grf as the GRF picker.
+// Drag and drop: the folder, or several of the files and folders it holds, go through the same path as the
+// picker; a lone .grf as the GRF picker.
 const readAll = (reader) =>
 	new Promise((resolve, reject) => {
 		const all = [];
@@ -99,13 +100,15 @@ const readAll = (reader) =>
 		next();
 	});
 
+const fileOf = (entry) => new Promise((resolve, reject) => entry.file(resolve, reject));
+
 async function walk(dir, prefix, into) {
 	for (const entry of await readAll(dir.createReader())) {
 		const path = prefix + entry.name;
 		if (entry.isDirectory) {
 			await walk(entry, path + '/', into);
 		} else {
-			into.push({ file: await new Promise((resolve, reject) => entry.file(resolve, reject)), path });
+			into.push({ file: await fileOf(entry), path });
 			if (into.length % 500 === 0) {
 				out.textContent = `Reading the folder… ${into.length} files`;
 			}
@@ -122,22 +125,37 @@ drop.addEventListener('dragleave', () => drop.classList.remove('over'));
 drop.addEventListener('drop', async (e) => {
 	e.preventDefault();
 	drop.classList.remove('over');
-	const items = [...e.dataTransfer.items];
-	const entry = items.length === 1 ? items[0].webkitGetAsEntry() : null;
-	if (entry && entry.isDirectory) {
-		progress.hidden = false;
-		out.textContent = 'Reading the folder…';
-		try {
-			await storeFolder(await walk(entry, '', []));
-		} catch (err) {
-			out.textContent = `Reading the folder failed: ${err}`;
-		}
-		progress.hidden = true;
-	} else if (entry && /\.grf$/i.test(entry.name)) {
+	const entries = [...e.dataTransfer.items].map((item) => item.webkitGetAsEntry()).filter(Boolean);
+	const [entry] = entries;
+	if (entries.length === 1 && !entry.isDirectory && /\.grf$/i.test(entry.name)) {
 		store(e.dataTransfer.files[0], null);
-	} else {
-		out.textContent = 'Drop the client folder itself (the one that holds data.grf).';
+		return;
 	}
+	if (!entries.length || (entries.length === 1 && !entry.isDirectory)) {
+		out.textContent = 'Drop the client folder (the one that holds data.grf), or what it holds.';
+		return;
+	}
+	progress.hidden = false;
+	out.textContent = 'Reading the folder…';
+	try {
+		const files = [];
+		if (entries.length === 1) {
+			await walk(entry, '', files);
+		} else {
+			// What the folder holds, selected in it: each item keeps its name as the top of its path.
+			for (const item of entries) {
+				if (item.isDirectory) {
+					await walk(item, item.name + '/', files);
+				} else {
+					files.push({ file: await fileOf(item), path: item.name });
+				}
+			}
+		}
+		await storeFolder(files);
+	} catch (err) {
+		out.textContent = `Reading the folder failed: ${err}`;
+	}
+	progress.hidden = true;
 });
 
 show();
