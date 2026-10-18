@@ -167,10 +167,14 @@ The metadata is sent again with every listed version: AMO overwrites the listing
 
 ### The add-on id
 
-The id stays `robrowser-relay@robrowser.local` (`browser_specific_settings.gecko.id`), the id 0.1.0 and
-0.2.0 were signed under, so AMO already knows the add-on by it. Firefox ties an installed copy, its updates
-and its stored folder to that id: a new id is a new add-on, and copies installed under the old one neither
-update to it nor keep their folder (the player installs again and drops the folder again).
+The id is `robrowser-relay@meitogi.github.io` (`browser_specific_settings.gecko.id`) from 0.3.0 on, the
+first version signed by meitogi's AMO account. 0.1.0 and 0.2.0 (release v0.2.0) were signed under
+`robrowser-relay@robrowser.local` by another account: for Firefox and AMO that is another add-on. A copy
+installed under the old id does not update to 0.3.0 and does not hand its folder over: remove it from
+`about:addons`, install 0.3.0, drop the folder again. Two copies installed side by side would both answer
+the page, so the old one has to go.
+
+Firefox ties an installed copy, its updates and its stored folder to the id: never change it again.
 
 Install a signed xpi by dropping it on Firefox; it stays across restarts, and installing a newer version over it
 keeps the stored folder.
