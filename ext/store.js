@@ -24,6 +24,7 @@ async function show(extra = '') {
 	}
 	out.textContent = grf ? `loose files: ${loose} (BGM: ${bgm}, System: ${system})${extra}` : extra.trim();
 	document.getElementById('play').hidden = state !== 'ready';
+	document.getElementById('forget').hidden = !grf;
 }
 
 const same = (a, b) => a && b && a.name === b.name && a.size === b.size && a.lastModified === b.lastModified;
@@ -81,6 +82,17 @@ document.getElementById('grf').addEventListener('change', (e) => {
 	if (e.target.files[0]) {
 		store(e.target.files[0], null);
 	}
+});
+
+// Deletes the stored folder (the browser's copy of the archive with it); the switch is left as it is.
+document.getElementById('forget').addEventListener('click', async () => {
+	if (!confirm('Forget the client folder? The browser deletes its copy; the game pages need a folder again.')) {
+		return;
+	}
+	await dbDelete('grf');
+	await dbDelete('root');
+	browser.runtime.sendMessage({ type: 'changed' });
+	await show('Client folder forgotten. The browser frees its disk space once this page is closed.');
 });
 
 // Drag and drop: the folder, or several of the files and folders it holds, go through the same path as the

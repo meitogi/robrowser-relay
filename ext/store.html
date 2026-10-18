@@ -31,7 +31,7 @@
 		<h1 id="title">Client folder</h1>
 		<ul class="intro">
 			<li>Plays roBrowser on <b>robrowser.suuuper.app</b> with your own game client files (private beta).</li>
-			<li>You give it your client folder once (<code>data.grf</code>, <code>BGM/</code>, <code>AI/</code>…); it stays in Firefox, nothing is uploaded.</li>
+			<li>You give it your client folder once (<code>data.grf</code>, <code>BGM/</code>, <code>AI/</code>…); it stays in your browser, nothing is uploaded.</li>
 			<li>While the relay is on, the game page reads its files from that folder and talks to the cyro.live API directly.</li>
 		</ul>
 	</section>
@@ -49,6 +49,7 @@
 	<progress id="progress" hidden></progress>
 	<p class="muted" id="out"></p>
 	<a class="btn primary big" id="play" href="https://robrowser.suuuper.app/upstream/cyro.live/" hidden>Ready — open the game</a>
+	<button class="btn" id="forget" hidden>Forget the client folder</button>
 </main>
 <script src="browser.js"></script>
 <script src="db.js"></script>
