@@ -30,6 +30,13 @@ if (location.port === '6988' || location.hostname === 'robrowser.suuuper.app' ||
 		});
 	}
 
+	// Asked by the popup for its checks: the cyro-live-patch userscript's version, when the page has it.
+	browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
+		if (msg.type === 'page') {
+			sendResponse({ patch: document.documentElement.dataset.roRelayPatch || null });
+		}
+	});
+
 	window.addEventListener('message', async (e) => {
 		if (e.source !== window || !e.data) {
 			return;

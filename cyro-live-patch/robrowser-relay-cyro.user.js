@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         roBrowser relay for cyro.live
 // @namespace    https://github.com/meitogi/robrowser-relay
-// @version      0.1.0
+// @version      0.1.1
 // @description  Plays https://cyro.live/rb2/ from your own client folder, held by the roBrowser relay extension. Without the extension the page plays as before.
 // @homepageURL  https://github.com/meitogi/robrowser-relay/tree/main/cyro-live-patch
 // @supportURL   https://github.com/meitogi/robrowser-relay/issues
@@ -19,6 +19,7 @@
 // and the loose files itself, before the network. Asked through the relay's page contract (README § Page
 // contract): { roRelay: 'want-files' } → { roRelay: 'files', files: { grf, root } | null }.
 (() => {
+	const VERSION = '0.1.1';
 	const WAIT = 1000;
 	const post = Worker.prototype.postMessage;
 	// Messages a worker is sent while the folder is being asked for, kept in order.
@@ -74,4 +75,17 @@
 			}
 		});
 	};
+
+	// Tells the relay's popup that the patch is on this page. At document-start <html> may not exist yet.
+	const mark = () => (document.documentElement.dataset.roRelayPatch = VERSION);
+	if (document.documentElement) {
+		mark();
+	} else {
+		new MutationObserver((records, observer) => {
+			if (document.documentElement) {
+				observer.disconnect();
+				mark();
+			}
+		}).observe(document, { childList: true });
+	}
 })();

@@ -9,7 +9,9 @@ extension holds, as the robrowser.suuuper.app pages do. Nothing changes on cyro.
 2. [Tampermonkey](https://www.tampermonkey.net/), then open
    [robrowser-relay-cyro.user.js](https://raw.githubusercontent.com/meitogi/robrowser-relay/main/cyro-live-patch/robrowser-relay-cyro.user.js)
    and click **Install**. Tampermonkey updates it from the same link.
-3. Open <https://cyro.live/rb2/>: the extension's toolbar icon shows **GRF** once the page took the folder.
+3. Open <https://cyro.live/rb2/>: the extension's toolbar icon shows **GRF** once the page took the folder,
+   and its popup lists ✓ cyro.live patch, ✓ the page took your folder, and how many game files still came
+   from the server.
 
 Without the extension, with the relay switched off or with no folder stored, the page plays as before,
 from cyro.live's servers.
@@ -23,6 +25,9 @@ out and the page carries `data-ro-relay="ready"`, it asks the relay for the fold
 [page contract](../README.md#page-contract)) and fills the list with `data.grf` and the loose files. The
 worker then reads them itself; whatever the folder lacks still comes from cyro.live. Messages sent to the
 worker while the folder is asked for are held and sent after it, in order.
+
+The userscript also sets `data-ro-relay-patch="<version>"` on `<html>`: the relay's popup reads it to show
+✓ « cyro.live patch <version> », or ✗ and an **Install the cyro.live patch** button when the page has none.
 
 The extension side is `content.js` running on `https://cyro.live/*`: it publishes the relay's state and
 answers `want-files` there as on the other game pages. No CORS rule is needed: the API is on the page's

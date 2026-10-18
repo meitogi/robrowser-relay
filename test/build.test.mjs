@@ -15,9 +15,10 @@ test('chrome: a description the Chrome Web Store takes', () => {
 	assert.ok(chrome.description.length <= 132, `${chrome.description.length} characters`);
 });
 
-test('chrome: declarativeNetRequest instead of blocking webRequest', () => {
+test('chrome: declarativeNetRequest instead of blocking webRequest, webRequest kept to observe', () => {
 	assert.ok(chrome.permissions.includes('declarativeNetRequestWithHostAccess'));
-	assert.ok(!chrome.permissions.some((p) => p.startsWith('webRequest')));
+	assert.ok(!chrome.permissions.includes('webRequestBlocking'));
+	assert.ok(chrome.permissions.includes('webRequest'), 'observing only, for the popup trace');
 	assert.ok(chrome.permissions.includes('unlimitedStorage'));
 });
 

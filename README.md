@@ -63,6 +63,14 @@ come from the roBrowserLegacy fork, `.github/pages-sites/shared/`.
   [Page contract](#page-contract). The hosted pages' `gate.js` boots the client on `ready` only: no signal
   within 1.5 s means no extension, and the page says so instead of loading the client.
 - **Badge.** When the page took the folder (`{ roRelay: 'used' }`) its tab's toolbar icon shows **GRF**.
+- **Checks.** On a game page, the popup lists, for its tab: the kind of page (one with the relay's page side
+  built in, or cyro.live's own page with the [cyro-live-patch](cyro-live-patch/) userscript, whose version the
+  page carries in `data-ro-relay-patch`), whether the page took the folder, and how many game files it still
+  fetched from the server (✓ none, ⚠︎ some: the folder lacks them). That count comes from observing the
+  `/grf/` requests of the game hosts (`webRequest.onBeforeRequest`, no blocking), per tab, and per page
+  origin for those a page's service worker sends with no tab; it starts again when the tab loads a page and
+  is kept in `storage.session`. `gamePage()` and `tabChecks()` in `ext/state.js` decide, tested in
+  `test/relay-state.test.mjs`.
 - **CORS.** `cyro.live/api` sends no `Access-Control-Allow-Origin`. It is added for the two game origins
   only (`https://robrowser.suuuper.app`, `https://cyro.localhost:6988`), while the relay is on. Firefox:
   `webRequest.onHeadersReceived`. Chrome has no blocking webRequest for a store extension: two

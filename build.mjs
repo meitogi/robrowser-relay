@@ -20,7 +20,8 @@ export function chromeManifest(m) {
 		'Private beta. Plays the roBrowser game pages on robrowser.suuuper.app from your own game client folder (GRF + BGM).';
 	chrome.background = { service_worker: 'background.js' };
 	// No blocking webRequest for a store extension: the CORS header comes from declarativeNetRequest rules.
-	chrome.permissions = m.permissions.filter((p) => !p.startsWith('webRequest')).concat('declarativeNetRequestWithHostAccess');
+	// webRequest stays, to observe (the popup's trace).
+	chrome.permissions = m.permissions.filter((p) => p !== 'webRequestBlocking').concat('declarativeNetRequestWithHostAccess');
 	content.js = ['browser.js', ...content.js];
 	chrome.web_accessible_resources = [{ resources: ['bridge.html'], matches: content.matches }];
 	return chrome;

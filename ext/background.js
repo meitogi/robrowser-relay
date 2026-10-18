@@ -48,6 +48,51 @@ browser.runtime.onMessage.addListener((msg, sender, sendResponse) => {
 	return true;
 });
 
+// The popup's trace: game files each tab fetched from the network instead of the folder since it last
+// loaded (its checks). In storage.session, which outlives Chrome's service worker going to sleep.
+const GAME_FILES = ['https://cyro.localhost/grf/*', 'https://robrowser.suuuper.app/grf/*', 'https://cyro.live/grf/*'];
+let network = null;
+const networkLoaded = browser.storage.session.get('network').then((r) => (network = r.network || {}));
+
+// Keys: a tab id, or `origin:<origin>` for what a page's service worker fetched, which has no tab
+// (tabId -1; Chrome names the page's origin in `initiator`, Firefox the worker in `originUrl`).
+async function trace(keys, reset) {
+	await networkLoaded;
+	let changed = false;
+	for (const key of keys) {
+		if (!reset) {
+			network[key] = (network[key] || 0) + 1;
+			changed = true;
+		} else if (key in network) {
+			delete network[key];
+			changed = true;
+		}
+	}
+	if (changed) {
+		browser.storage.session.set({ network });
+	}
+}
+
+// A tab that loads a page starts again. Not on a main_frame request: a page its service worker controls
+// loads without one. tab.url is only there for the hosts the extension may access, the game pages.
+browser.tabs.onUpdated.addListener((tabId, change, tab) => {
+	if (change.status === 'loading' && tab.url) {
+		trace([tabId, `origin:${new URL(tab.url).origin}`], true);
+	}
+});
+browser.webRequest.onBeforeRequest.addListener(
+	(d) => {
+		const origin = d.initiator || (d.originUrl && new URL(d.originUrl).origin);
+		if (d.tabId >= 0) {
+			trace([d.tabId], false);
+		} else if (origin) {
+			trace([`origin:${origin}`], false);
+		}
+	},
+	{ urls: GAME_FILES }
+);
+browser.tabs.onRemoved.addListener((tabId) => trace([tabId], true));
+
 // cyro.live/api sends no Access-Control-Allow-Origin. While the relay is on the game page calls it
 // directly instead of through its server's /api proxy (relay-sw.js): allow the game page origins.
 // Firefox adds the header with blocking webRequest; Chrome has none for a store extension, so there

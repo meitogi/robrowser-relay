@@ -60,6 +60,8 @@ Hands the user's own game client folder (data.grf and its loose files), stored o
 | Permission | Justification |
 |---|---|
 | `unlimitedStorage` | The client folder is stored in the extension's IndexedDB; the game archive alone is about 4.4 GB. |
+| `webRequest` | Observing only, never blocking: the requests for game files (https://cyro.localhost/grf/*, https://robrowser.suuuper.app/grf/*, https://cyro.live/grf/*) are counted per tab, so the popup can say whether a game page still loads files from the server instead of the player's folder. Only the count is kept, in session storage. |
+| `storage` | Session storage holds that per-tab count, so it survives the service worker going to sleep. |
 | `declarativeNetRequestWithHostAccess` | https://cyro.live/api/ sends no Access-Control-Allow-Origin header. While the relay is switched on, two dynamic rules set it on the responses of https://cyro.live/api/ only, for requests made by the two game origins (https://robrowser.suuuper.app, https://cyro.localhost). Nothing is read, logged or redirected; the rules are removed when the relay is switched off. |
 | Host permissions | https://robrowser.suuuper.app/*: the hosted game pages, where the content script runs and the extension frame that hands over the folder is embedded. https://cyro.localhost/*: the same game page served by the player's own machine (*.localhost resolves to loopback only). https://cyro.live/*: the API whose responses get the CORS header above, and the content script on https://cyro.live/rb2/, which hands the folder to that page when the project's cyro-live-patch userscript asks for it. |
 | Remote code | No, I am not using remote code. Every script is in the package; the code is not minified or bundled. |

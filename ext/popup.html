@@ -6,7 +6,13 @@
 <style>
 	body { width: 300px; padding: 12px; }
 	body > * + * { margin-top: 10px; }
-	#tab:empty { display: none; }
+	.checks { margin: 0; padding: 0; list-style: none; }
+	.checks li { display: flex; gap: 6px; }
+	.checks li + li { margin-top: 4px; }
+	.checks .mark { width: 1em; flex: none; text-align: center; font-weight: 600; }
+	.checks [data-level='pass'] .mark { color: var(--ready); }
+	.checks [data-level='warn'] .mark, .checks [data-level='fail'] .mark { color: var(--nogrf); }
+	.checks [data-level='wait'] .mark { color: var(--muted); }
 </style>
 </head>
 <body>
@@ -18,10 +24,11 @@
 	<span class="mark" aria-hidden="true"></span>
 	<div><strong></strong><span class="detail">…</span></div>
 </div>
-<p class="muted" id="tab"></p>
+<ul class="checks" id="checks" hidden></ul>
 <label class="switch">Relay on <input type="checkbox" role="switch" id="enabled"></label>
 <button class="btn primary" id="grant" hidden>Allow access to the game pages and cyro.live</button>
 <button class="btn" id="store">Choose the client folder…</button>
+<a class="btn" id="patch" href="https://raw.githubusercontent.com/meitogi/robrowser-relay/main/cyro-live-patch/robrowser-relay-cyro.user.js" target="_blank" hidden>Install the cyro.live patch</a>
 <script src="browser.js"></script>
 <script src="db.js"></script>
 <script src="state.js"></script>

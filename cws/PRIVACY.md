@@ -26,6 +26,13 @@ storage. Choosing another folder replaces the stored one.
 The game page itself talks to the game server (`cyro.live`) as any online game client does; that traffic is
 the page's, not the extension's.
 
+## What it observes
+
+To tell you in its popup whether a game page plays from your folder, it counts, per tab, the requests for
+game files (`/grf/…` on `robrowser.suuuper.app`, `cyro.localhost` and `cyro.live`) that still go to the
+server. It keeps only that number, in the browser's session storage, cleared when the browser closes; it
+reads nothing else of those requests and sends nothing anywhere.
+
 ## Contact
 
 Questions: <https://github.com/meitogi/robrowser-relay/issues>.
