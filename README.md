@@ -153,7 +153,7 @@ file is downloaded later from the Developer Hub page that web-ext prints.
 
 | File | Goes to |
 |---|---|
-| [`metadata.json`](amo/metadata.json) | sent by `--channel=listed`: name, summary (≤ 250 characters), description, category `games-entertainment`, homepage (this repository) and support URL (its issues), licence `GPL-3.0-or-later`, and the reviewer notes (`version.approval_notes`) |
+| [`metadata.json`](amo/metadata.json) | sent by `--channel=listed`: name, summary (≤ 250 characters), description, category `games-entertainment`, homepage (this repository) and support URL (its issues), licence `GPL-3.0-only` (AMO has no or-later slug; the repository stays GPL-3.0-or-later, which allows it), and the reviewer notes (`version.approval_notes`) |
 | [`REVIEWER-NOTES.md`](amo/REVIEWER-NOTES.md) | the readable copy of `version.approval_notes`: why `webRequestBlocking`, `unlimitedStorage` and each of the three hosts |
 | [`PRIVACY.md`](amo/PRIVACY.md) | pasted by hand into Developer Hub → the add-on → **Edit Product Page** → privacy policy (the submission API does not take it) |
 
