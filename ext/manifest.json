@@ -42,7 +42,8 @@
 		{
 			"matches": [
 				"https://cyro.localhost/*",
-				"https://robrowser.suuuper.app/*"
+				"https://robrowser.suuuper.app/*",
+				"https://cyro.live/*"
 			],
 			"js": [
 				"state.js",

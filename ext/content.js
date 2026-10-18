@@ -1,10 +1,10 @@
-// Bridge between the game pages (https://cyro.localhost:6988, https://robrowser.suuuper.app/<build>/<server>/)
-// and the extension.
+// Bridge between the game pages (https://cyro.localhost:6988, https://robrowser.suuuper.app/<build>/<server>/,
+// and https://cyro.live/rb2/ with the cyro-live-patch userscript) and the extension.
 // - <html data-ro-relay="ready|off|nogrf"> and a `ro-relay` event, detail { ready, state, name }, once the
 //   extension state is known (relayState, state.js).
 // - The page posts { roRelay: 'want-files' }, gets { roRelay: 'files', files: { grf, root } | null }.
 // - The page posts { roRelay: 'used' } once it took the files: the toolbar icon of this tab is marked.
-if (location.port === '6988' || location.hostname === 'robrowser.suuuper.app') {
+if (location.port === '6988' || location.hostname === 'robrowser.suuuper.app' || location.hostname === 'cyro.live') {
 	// Firefox only: objects handed to the page cross from this script's compartment.
 	const FIREFOX = typeof cloneInto === 'function';
 	const clone = (value) => (FIREFOX ? cloneInto(value, window) : value);

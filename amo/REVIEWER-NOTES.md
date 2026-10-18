@@ -5,7 +5,7 @@ Test: install, open the welcome page (it opens on install), click "Allow accessâ
 Permissions:
 - webRequest + webRequestBlocking: https://cyro.live/api/ (the game server's API) sends no Access-Control-Allow-Origin header. While the relay is switched on, background.js adds it on the responses of https://cyro.live/api/* only, with the requesting origin as the value, and only when that origin is one of the two game origins (https://robrowser.suuuper.app, https://cyro.localhost:6988). Nothing is read, logged or redirected.
 - unlimitedStorage: the client folder is stored in the extension's IndexedDB; the archive alone is about 4.4 GB.
-- Host https://cyro.live/*: needed for the webRequest listener on https://cyro.live/api/*.
+- Host https://cyro.live/*: needed for the webRequest listener on https://cyro.live/api/*, and for content.js on https://cyro.live/rb2/: that page asks for the folder only when the user also installed the project's userscript (cyro-live-patch/ in the repository); without it, content.js only sets data-ro-relay there.
 - Host https://robrowser.suuuper.app/*: the hosted game pages, one folder per client build and server (/<build>/<server>/); content.js runs there, and the background clears its toolbar badge on those tabs (tabs.query by URL).
 - Host https://cyro.localhost/*: the same game page served by the player's own machine (*.localhost resolves to loopback only).
 

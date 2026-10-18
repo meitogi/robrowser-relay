@@ -23,6 +23,8 @@ Private beta: for now it works only with the roBrowser game pages on https://rob
 - https://robrowser.suuuper.app/native-plugin-manager/cyro.live/ — the build with the plugin manager, behind a beta access key;
 - https://robrowser.suuuper.app/cyro/cyro.live/ — the client cyro.live serves on its own site, open to everyone.
 
+cyro.live's own page, https://cyro.live/rb2/, plays from your folder too with a small userscript installed next to the extension: https://github.com/meitogi/robrowser-relay/tree/main/cyro-live-patch
+
 How it works:
 - Drop your client folder once on the welcome page (or pick it). It is stored in Chrome on your computer, never uploaded.
 - Open a game page: it loads its maps, sprites and music from your folder.
@@ -50,7 +52,7 @@ This extension is an independent, unofficial project, not affiliated with or end
 **Single purpose**
 
 ```text
-Hands the user's own game client folder (data.grf and its loose files), stored once in the extension, to the roBrowser game pages on https://robrowser.suuuper.app/ so they load their assets from it, and lets those pages read the responses of the game server's API (https://cyro.live/api/).
+Hands the user's own game client folder (data.grf and its loose files), stored once in the extension, to the roBrowser game pages on https://robrowser.suuuper.app/ (and https://cyro.live/rb2/ with the project's userscript) so they load their assets from it, and lets those pages read the responses of the game server's API (https://cyro.live/api/).
 ```
 
 **Permission justifications**
@@ -59,7 +61,7 @@ Hands the user's own game client folder (data.grf and its loose files), stored o
 |---|---|
 | `unlimitedStorage` | The client folder is stored in the extension's IndexedDB; the game archive alone is about 4.4 GB. |
 | `declarativeNetRequestWithHostAccess` | https://cyro.live/api/ sends no Access-Control-Allow-Origin header. While the relay is switched on, two dynamic rules set it on the responses of https://cyro.live/api/ only, for requests made by the two game origins (https://robrowser.suuuper.app, https://cyro.localhost). Nothing is read, logged or redirected; the rules are removed when the relay is switched off. |
-| Host permissions | https://robrowser.suuuper.app/*: the hosted game pages, where the content script runs and the extension frame that hands over the folder is embedded. https://cyro.localhost/*: the same game page served by the player's own machine (*.localhost resolves to loopback only). https://cyro.live/*: the API whose responses get the CORS header above. |
+| Host permissions | https://robrowser.suuuper.app/*: the hosted game pages, where the content script runs and the extension frame that hands over the folder is embedded. https://cyro.localhost/*: the same game page served by the player's own machine (*.localhost resolves to loopback only). https://cyro.live/*: the API whose responses get the CORS header above, and the content script on https://cyro.live/rb2/, which hands the folder to that page when the project's cyro-live-patch userscript asks for it. |
 | Remote code | No, I am not using remote code. Every script is in the package; the code is not minified or bundled. |
 
 **Data usage**: tick none of the data types. Tick the three certifications (no sale to third parties, no

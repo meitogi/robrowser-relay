@@ -16,7 +16,8 @@ storage. Choosing another folder replaces the stored one.
 ## What it hands over, and to whom
 
 - **The client folder, to the game pages only**, inside the browser: the roBrowser pages on
-  `https://robrowser.suuuper.app/` and their local copy on your own machine, `https://cyro.localhost/`. The page asks for the files and gets
+  `https://robrowser.suuuper.app/` and their local copy on your own machine, `https://cyro.localhost/`, and
+  cyro.live's own page (`https://cyro.live/rb2/`) when the separate cyro-live-patch userscript is installed. The page asks for the files and gets
   them within the browser; they are never uploaded.
 - **One response header on the game API.** While the relay is on, it adds `Access-Control-Allow-Origin` to
   the responses of `https://cyro.live/api/`, so that the game pages above may read them. It does not

@@ -9,6 +9,7 @@ game pages:
 | <https://robrowser.suuuper.app/upstream/cyro.live/> | roBrowser as published upstream, plus the fixes the relay needs. Open to everyone. |
 | <https://robrowser.suuuper.app/native-plugin-manager/cyro.live/> | the build with the native plugin manager. Asks for a beta access key. |
 | <https://robrowser.suuuper.app/cyro/cyro.live/> | the client cyro.live serves on its own site. Open to everyone. |
+| <https://cyro.live/rb2/> | cyro.live's own page, with the [cyro-live-patch](cyro-live-patch/) userscript installed next to the extension. |
 
 You give the extension your client folder once (`data.grf` plus its loose files: `BGM/`, `AI/`, `System/`…).
 It stays in the browser, on your computer; nothing is uploaded. While the relay is on, the game page reads its
