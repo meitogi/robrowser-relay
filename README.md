@@ -234,6 +234,19 @@ Chrome's extension id comes from the store at the first upload (an unpacked copy
 folder's path). As in Firefox, the stored folder belongs to that id: a player moving from an unpacked copy
 to the store's drops the folder again.
 
+### The players' kit (`player-kit/`)
+
+Players get one zip, `grf-offline-cyro.zip`: the guides at its root (`START-HERE.html`, `README.txt`),
+`extensions/` (the signed xpi, `dist/chrome` for **Load unpacked**, the cyro-live-patch userscript) and
+`game/` (the client folder). `player-kit/render.mjs` writes the guides from the two templates beside it,
+screenshots from `cws/screenshots/` inlined. The zip and the online copy of the guide are built and
+uploaded by `wtf relay kit-publish` from the monorepo (`robrowser/tools/client-data/grf-offline-publish.sh`),
+after `./sign.sh` signed the manifest's version.
+
+When a store publishes the extension: paste its page's URL in
+[`player-kit/store-links.env`](player-kit/store-links.env) and publish the kit again. That browser's step
+becomes the store install, the manual one folds under it.
+
 ## Licence
 
 [GPL-3.0-or-later](LICENSE), the licence of roBrowserLegacy, whose pages this extension serves.
