@@ -42,7 +42,7 @@ This extension is an independent, unofficial project, not affiliated with or end
 | Category | Games or Entertainment, whichever the dashboard lists |
 | Language | English |
 | Store icon (128×128) | `ext/icons/icon-128.png` |
-| Screenshots (1280×800) | `plans/public-release/shots/chrome-*.png` in the dev monorepo, taken in Chrome |
+| Screenshots (1280×800) | [`cws/screenshots/`](screenshots/), in their order: the welcome page, the folder stored, the popup's checks on cyro.live with the patch, then without it. The extension's own pages, filled with what they showed in Chromium; the game page behind the popup is a neutral one drawn for them, with no game art or server branding |
 | Official URL | none |
 | Homepage URL | `https://github.com/meitogi/robrowser-relay` |
 | Support URL | `https://github.com/meitogi/robrowser-relay/issues` |
