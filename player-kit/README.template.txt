@@ -90,8 +90,30 @@ Later: the extension's icon in the toolbar > "Choose the client folder...".
 Log in with your cyro.live account as usual.
 
 ON CYRO.LIVE: https://cyro.live/rb2/
-cyro.live's own page. It needs the cyro.live patch, once, so that it reads
-your files:
+cyro.live's own page. It needs the cyro.live patch, a small Tampermonkey
+script, once.
+
+  Why a patch? The robrowser.suuuper.app pages are built to work with the
+  extension. cyro.live's page is not: its game client can read files from
+  your computer, but the page hands it an empty list, so it downloads
+  everything from the server. The patch fills that list with the game
+  folder the extension holds. Nothing changes on cyro.live's side.
+
+  What it does, and nothing else:
+    - it runs on cyro.live/rb2 only;
+    - when the game starts loading its files, and the extension says
+      "Ready", it gives the game your game folder;
+    - it marks the page, so the extension's popup can show "cyro.live
+      patch".
+  It sends nothing anywhere and makes no request of its own; it does not
+  touch your login, your password, the chat or the game itself; it asks
+  Tampermonkey for no special permission (@grant none). Without the
+  extension, or with it switched off, the page plays exactly as before.
+  About 90 lines, open source:
+  https://github.com/meitogi/robrowser-relay/blob/main/cyro-live-patch/robrowser-relay-cyro.user.js
+  Tampermonkey takes its updates from that same repository.
+
+Install it:
 
   a. Install Tampermonkey for your browser: https://www.tampermonkey.net/
   b. Chrome, Edge, Brave, Opera: chrome://extensions > Tampermonkey >

@@ -185,7 +185,26 @@ game/              the game files</div>
 <p>Log in with your cyro.live account as usual.</p>
 
 <h3>On cyro.live: <a href="https://cyro.live/rb2/">cyro.live/rb2</a></h3>
-<p>cyro.live's own page. It needs the <b>cyro.live patch</b>, once, so that it reads your files:</p>
+<p>cyro.live's own page. It needs the <b>cyro.live patch</b>, a small Tampermonkey script, once.</p>
+<div class="box">
+	<p><b>Why a patch?</b> The robrowser.suuuper.app pages are built to work with the extension.
+	cyro.live's page is not: its game client can read files from your computer, but the page hands it an
+	empty list, so it downloads everything from the server. The patch fills that list with the game folder
+	the extension holds. Nothing changes on cyro.live's side.</p>
+	<p><b>What it does, and nothing else:</b></p>
+	<ul>
+		<li>it runs on <code>cyro.live/rb2</code> only;</li>
+		<li>when the game starts loading its files, and the extension says <span class="ok">✓ Ready</span>,
+		it gives the game your game folder;</li>
+		<li>it marks the page, so the extension's popup can show <span class="ok">✓ cyro.live patch</span>.</li>
+	</ul>
+	<p>It sends nothing anywhere and makes no request of its own; it does not touch your login, your password,
+	the chat or the game itself; it asks Tampermonkey for no special permission (<code>@grant none</code>).
+	Without the extension, or with it switched off, the page plays exactly as before. It is about 90 lines,
+	open source: <a href="https://github.com/meitogi/robrowser-relay/blob/main/cyro-live-patch/robrowser-relay-cyro.user.js">read it</a>.
+	Tampermonkey takes its updates from that same repository.</p>
+</div>
+<p>Install it:</p>
 <ol>
 	<li>Install <a href="https://www.tampermonkey.net/">Tampermonkey</a> for your browser.</li>
 	<li>Chrome, Edge, Brave, Opera: <code>chrome://extensions</code> → Tampermonkey → <b>Details</b> → turn on
