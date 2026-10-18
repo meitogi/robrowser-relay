@@ -217,6 +217,7 @@ unpacked.
 
 | File | Goes to |
 |---|---|
+| [`PUBLISH.md`](cws/PUBLISH.md) | the steps: developer account, first submission, updates |
 | [`LISTING.md`](cws/LISTING.md) | the dashboard's **Store listing** and **Privacy** tabs, field by field: summary, description, category, single purpose, the reason for each permission, the data usage answers |
 | [`PRIVACY.md`](cws/PRIVACY.md) | the privacy policy, linked by its GitHub URL in the **Privacy** tab |
 
