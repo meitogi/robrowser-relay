@@ -2,3 +2,4 @@ web-ext-artifacts/
 sign-*.log
 ext/.amo-upload-uuid
 .DS_Store
+dist/

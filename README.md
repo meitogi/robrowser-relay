@@ -1,4 +1,4 @@
-# roBrowser relay — Firefox extension
+# roBrowser relay — Firefox and Chrome extension
 
 **Private beta.** Plays roBrowser, the web client of the classic Midgard MMO, on
 [robrowser.suuuper.app](https://robrowser.suuuper.app/) with your own game files. It works only with those
@@ -11,7 +11,7 @@ game pages:
 | <https://robrowser.suuuper.app/cyro/cyro.live/> | the client cyro.live serves on its own site. Open to everyone. |
 
 You give the extension your client folder once (`data.grf` plus its loose files: `BGM/`, `AI/`, `System/`…).
-It stays in Firefox, on your computer; nothing is uploaded. While the relay is on, the game page reads its
+It stays in the browser, on your computer; nothing is uploaded. While the relay is on, the game page reads its
 assets from that folder and calls the cyro.live API directly. The game socket goes straight to
 `wss://cyro.live`.
 
@@ -19,9 +19,11 @@ Bugs and questions: [issues](https://github.com/meitogi/robrowser-relay/issues).
 
 ## Install and play
 
-1. Install the extension (addons.mozilla.org, or a signed `.xpi` from the
-   [releases](https://github.com/meitogi/robrowser-relay/releases) dropped on Firefox). The welcome page
-   opens: click **Allow access to the game pages and cyro.live** if it is shown.
+1. Install the extension. Firefox: addons.mozilla.org, or a signed `.xpi` from the
+   [releases](https://github.com/meitogi/robrowser-relay/releases) dropped on Firefox. Chrome (and Edge):
+   the Chrome Web Store, or the release's `-chrome.zip` unzipped and loaded with **Load unpacked** in
+   `chrome://extensions` (developer mode on). The welcome page opens: click **Allow access to the game pages
+   and cyro.live** if it is shown.
 2. Drop your client folder on the page (the folder that holds `data.grf`), or click to pick it. Expect ✓
    **Ready**. Firefox's folder picker does not follow symlinks: a linked `BGM/` comes in empty, so copy it.
 3. **Ready — open the game**, or open one of the pages above.
@@ -43,11 +45,15 @@ come from the roBrowserLegacy fork, `.github/pages-sites/shared/`.
 | `ext/` | relay | This extension. |
 
 - **Storage.** The folder is kept in the extension's IndexedDB (`unlimitedStorage`): `grf` (the archive
-  `File`), `root` (`{ <lowercased path>: File }` for the loose files), `enabled`. Choosing the same
-  `data.grf` again does not copy it again (same name, size and date).
+  `File`), `root` (`{ <lowercased path>: File }` for the loose files), `enabled`. Both browsers copy the
+  archive into the profile (Chrome: 4.4 GB in 22 s); choosing the same `data.grf` again does not copy it
+  again (same name, size and date).
 - **Hand-over.** `content.js` runs on `robrowser.suuuper.app` and `cyro.localhost:6988` only. The page posts
-  `{ roRelay: 'want-files' }`; the background answers with the stored `File`s, by structured clone, which
-  passes references: 18 ms for the 4.4 GB archive, nothing copied.
+  `{ roRelay: 'want-files' }` and gets the stored `File`s by structured clone, which passes references:
+  nothing copied. Firefox: the background answers over runtime messaging, 18 ms for the 4.4 GB archive.
+  Chrome's runtime messaging is JSON, which drops a `File`: `content.js` adds a hidden frame of the
+  extension, `bridge.html`, which reads the IndexedDB and posts the `File`s to the page by window messaging
+  (4 ms, the page's heap flat).
 - **Reads.** `relay-sw.js` parses the GRF (0x200 / 0x300) and resolves a request as a GRF file server
   would: loose files, then the archive, then the `data/resnametable.txt` alias. `POST /grf/`
   (`FileManager.search`) is answered from the file table. DES-encrypted entries are left to the network
@@ -56,9 +62,11 @@ come from the roBrowserLegacy fork, `.github/pages-sites/shared/`.
   [Page contract](#page-contract). The hosted pages' `gate.js` boots the client on `ready` only: no signal
   within 1.5 s means no extension, and the page says so instead of loading the client.
 - **Badge.** When the page took the folder (`{ roRelay: 'used' }`) its tab's toolbar icon shows **GRF**.
-- **CORS.** `cyro.live/api` sends no `Access-Control-Allow-Origin`. `webRequest.onHeadersReceived` adds it
-  for the two game origins only (`https://robrowser.suuuper.app`, `https://cyro.localhost:6988`), while the
-  relay is on.
+- **CORS.** `cyro.live/api` sends no `Access-Control-Allow-Origin`. It is added for the two game origins
+  only (`https://robrowser.suuuper.app`, `https://cyro.localhost:6988`), while the relay is on. Firefox:
+  `webRequest.onHeadersReceived`. Chrome has no blocking webRequest for a store extension: two
+  `declarativeNetRequest` dynamic rules (`modifyHeaders`, by initiator), added when the relay is switched on
+  and removed when it is switched off. Preflights and the service worker's own requests are covered.
 - **Popup.** The relay's name and version, one status line with a mark — ✓ **Ready**, ⚠︎ **No client
   folder**, ✗ **Relay off** (the [page contract](#page-contract) states) — and the stored archive's name,
   size and loose-file count, then whether this tab uses the relay, the on/off switch, **Allow access to the
@@ -106,13 +114,24 @@ the background for the state once, right after `document_start`, then publishes 
 
 ## Develop
 
+`ext/` is the source of both packages, and `ext/manifest.json` is Firefox's. `node build.mjs` writes
+`dist/firefox` (`ext/` without the Chrome-only `bridge.*`) and `dist/chrome` (all of `ext/`, its manifest
+derived from Firefox's: service worker, `declarativeNetRequestWithHostAccess` instead of `webRequest*`,
+`bridge.html` web-accessible to the game pages, no `browser_specific_settings`). Edit `ext/`, never `dist/`.
+The code is shared: `browser.js` aliases `browser` to `chrome`, and where the two differ the manifest
+decides (`declarativeNetRequest` present or not) or Firefox's `cloneInto` does.
+
 ```bash
+node build.mjs
 node --test test/*.test.mjs
-npx web-ext@10.8.0 lint --source-dir ext
+npx web-ext@10.8.0 lint --source-dir dist/firefox
 ```
 
-Firefox: `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on…** → `ext/manifest.json`. A
-temporary add-on is removed when Firefox quits; it counts as an install, so the welcome page opens.
+Firefox: `about:debugging#/runtime/this-firefox` → **Load Temporary Add-on…** → `dist/firefox/manifest.json`.
+A temporary add-on is removed when Firefox quits; it counts as an install, so the welcome page opens.
+
+Chrome: `chrome://extensions` → developer mode → **Load unpacked** → `dist/chrome`. After a rebuild, its
+reload arrow on that page.
 
 `https://cyro.localhost:6988/` is a local copy of the game page served from the player's own machine
 (`*.localhost` resolves to loopback only); the relay treats it as a game page too. Its service worker's own
@@ -121,11 +140,13 @@ origin → **Inspect**, not in the page's network panel.
 
 The icons are drawn in `icons-src/` (`poring-small.svg` for 16 and 32 px, `poring-grf.svg` for 48 and
 96 and 128 px) and exported to `ext/icons/` with [sharp](https://sharp.pixelplumbing.com/). The 128 px
-one is the icon AMO shows on the listing.
+one is the icon AMO and the Chrome Web Store show on the listing.
 
 ## Release
 
-Signing needs the AMO API keys, which stay on the maintainer's machine:
+The same version goes to both stores, from `ext/manifest.json`.
+
+Firefox: signing needs the AMO API keys, which stay on the maintainer's machine:
 
 ```bash
 export AMO_JWT_ISSUER=… AMO_JWT_SECRET=…   # addons.mozilla.org > Developer Hub > Manage API Keys

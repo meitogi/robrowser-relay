@@ -31,3 +31,11 @@ function run(mode, op) {
 
 const dbGet = (key) => run('readonly', (s) => s.get(key));
 const dbPut = (key, value) => run('readwrite', (s) => s.put(value, key));
+
+// The client folder handed to a game page; null while the relay is off.
+async function storedFiles() {
+	if ((await dbGet('enabled')) === false) {
+		return null;
+	}
+	return { grf: (await dbGet('grf')) || null, root: (await dbGet('root')) || {} };
+}

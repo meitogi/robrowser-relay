@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# HOST-SIDE ONLY. Lints and signs the relay extension (ext/) on AMO.
+# HOST-SIDE ONLY. Builds, lints and signs the Firefox package (dist/firefox, from ext/) on AMO.
 #   --channel=unlisted  (default) signed xpi, installable from a direct link, not on addons.mozilla.org
 #   --channel=listed    public AMO page; sends the listing from amo/metadata.json (human review)
 #   --dry-run           prints the web-ext command line and stops: no lint, no network, no credentials
@@ -31,7 +31,7 @@ fi
 WEB_EXT=web-ext@10.8.0
 # "Waiting for approval…" prints for every submission; wait up to 45 min instead of the 15 min default.
 sign=(npx --yes "$WEB_EXT" sign --channel="$channel" --approval-timeout 2700000
-	--source-dir ext
+	--source-dir dist/firefox
 	--artifacts-dir web-ext-artifacts
 	--api-key "${AMO_JWT_ISSUER:-\$AMO_JWT_ISSUER}" --api-secret "${AMO_JWT_SECRET:-\$AMO_JWT_SECRET}")
 # The listing (name, summary, categories, licence, reviewer notes) goes with the listed submission only.
@@ -48,8 +48,10 @@ fi
 log="sign-$(date +%Y%m%d-%H%M%S).log"
 exec > >(tee "$log") 2>&1
 
+echo "=== build"
+node build.mjs
 echo "=== lint"
-npx --yes "$WEB_EXT" lint --source-dir ext
+npx --yes "$WEB_EXT" lint --source-dir dist/firefox
 echo "=== sign ($channel)"
 "${sign[@]}"
 ls -l web-ext-artifacts/*.xpi
