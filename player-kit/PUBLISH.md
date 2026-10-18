@@ -118,7 +118,8 @@ What it does: rebuilds the extension, checks that the signed xpi of its version 
 `dist/grf-offline-cyro-<date>.zip`, fetches rclone (once, SHA256 checked), uploads the zip as
 `grf-offline-cyro.zip` (after the extension alone, so its links answer while the kit uploads), compares the
 local and remote md5, uploads the online guide, deletes `cyro-client.zip` if it is still there, then the
-local zip (`--keep-zip` keeps it). It ends by checking that the players' links answer 200 and printing the
+local zip (`--keep-zip` keeps it). It lists what the bucket holds, checks that the players' links answer 200
+(else exit 3) and prints the
 announce, `dist/DISCORD.md` (from `DISCORD.template.md`: the store pages replace the extension's files once
 they are in `store-links.env`).
 
@@ -135,3 +136,6 @@ they are in `store-links.env`).
 | DNS / connection error on `…r2.cloudflarestorage.com` | bucket created with a jurisdiction: `R2_ENDPOINT` (step 2) |
 | `does not match the local zip` | incomplete upload: run it again, the local zip was kept |
 | `no signed Firefox package for <version>` | `ext/manifest.json`'s version is not signed: `./sign.sh --channel=unlisted` |
+| `✗ HTTP 000` on the players' links (exit 3) | the upload is done, the public address does not answer: its DNS does not resolve or its certificate is not issued yet. The custom domain must be listed and *Active* under **this** bucket's **Custom Domains**, on the account the token belongs to. Fix it, then `curl -I <public address>/guide/START-HERE.html`: no new upload needed |
+| `✗ HTTP 404` on the players' links (exit 3) | the domain is connected to another bucket |
+| the dashboard shows the bucket empty after a verified upload | another account or another bucket is open in the dashboard: the run prints the bucket, the account and what the bucket holds |

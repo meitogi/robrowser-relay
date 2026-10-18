@@ -13,6 +13,8 @@
 #   game/                         KIT_GAME_DIR, the client folder (data.grf, BGM/, AI/, System/)
 # game/ is staged as a symlink (zip follows it), so the 5.7 GB of game files are not copied.
 #
+# Exit 3 : uploaded, but a players' link does not answer 200 (the public address, not the upload).
+#
 # Uploaded as grf-offline-cyro.zip, plus guide/START-HERE.html and guide/README.txt, so a link shows the
 # guide before the download (its download button is ../grf-offline-cyro.zip), and the extension alone,
 # extensions/roBrowser-relay-firefox.xpi and extensions/roBrowser-relay-chrome.zip, so a player installs it
@@ -235,6 +237,8 @@ export RCLONE_CONFIG_R2_SECRET_ACCESS_KEY="$R2_SECRET_ACCESS_KEY"
 export RCLONE_CONFIG_R2_ENDPOINT="${R2_ENDPOINT:-https://$R2_ACCOUNT_ID.r2.cloudflarestorage.com}"
 # A token scoped to one bucket may not list or create buckets.
 export RCLONE_CONFIG_R2_NO_CHECK_BUCKET=true
+# Everything comes from the environment : no config file, and no « Config file not found » notice.
+export RCLONE_CONFIG=/dev/null
 
 # ── which bucket ────────────────────────────────────────────────────────────
 if [ -z "$BUCKET" ]; then
@@ -309,13 +313,30 @@ if [ "$KEEP_ZIP" = 0 ]; then
 	echo "[publish] local zip removed (R2 holds the verified copy) — --keep-zip to keep it"
 fi
 
+# ── what the bucket holds now ───────────────────────────────────────────────
+echo "[publish] r2:$BUCKET at ${R2_ENDPOINT:-account $R2_ACCOUNT_ID} now holds :"
+"$RCLONE" lsl "r2:$BUCKET" | awk '{ printf "  %10.1f MB  %s\n", $1 / 1048576, $NF }'
+
 # ── the players' links ──────────────────────────────────────────────────────
-echo "[publish] players' links :"
+# The upload is done ; whether players can download it is the public address's business. A link that
+# does not answer 200 fails the run, with what its code means.
+echo "[publish] players' links (R2_PUBLIC_URL, at the top of player-kit/publish.sh) :"
+BROKEN=
 for path in guide/START-HERE.html "$KIT.zip" extensions/roBrowser-relay-firefox.xpi extensions/roBrowser-relay-chrome.zip; do
-	code=$(curl -s -o /dev/null -I -w '%{http_code}' "$R2_PUBLIC_URL/$path" || true)
-	if [ "$code" = 200 ]; then mark='✓'; else mark="✗ HTTP $code"; fi
-	echo "  $mark $R2_PUBLIC_URL/$path"
+	code=$(curl -s -o /dev/null -I --max-time 20 -w '%{http_code}' "$R2_PUBLIC_URL/$path" || true)
+	if [ "$code" = 200 ]; then echo "  ✓ $R2_PUBLIC_URL/$path"; else echo "  ✗ HTTP $code $R2_PUBLIC_URL/$path"; BROKEN=$code; fi
 done
-echo "  (public address : R2_PUBLIC_URL, at the top of player-kit/publish.sh)"
+if [ -n "$BROKEN" ]; then
+	HOST=$(printf '%s' "$R2_PUBLIC_URL" | sed 's#^[a-z]*://##; s#/.*##')
+	echo "✗ uploaded to r2:$BUCKET, but players cannot download it from $R2_PUBLIC_URL :" >&2
+	case "$BROKEN" in
+		000) echo "  → no answer from $HOST : its DNS does not resolve or its TLS certificate is not issued yet. R2 → bucket '$BUCKET' → Settings → Custom Domains : is $HOST listed there, and Active ? It must be connected to THIS bucket, on the account the token belongs to." >&2 ;;
+		404) echo "  → $HOST answers but has no such file : it is connected to another bucket than '$BUCKET'." >&2 ;;
+		401|403) echo "  → $HOST refuses : public access is off for it (R2 → bucket '$BUCKET' → Settings)." >&2 ;;
+		*) echo "  → HTTP $BROKEN from $HOST." >&2 ;;
+	esac
+	echo "  Fix the domain, then check : curl -I $R2_PUBLIC_URL/guide/START-HERE.html — no need to upload again." >&2
+	exit 3
+fi
 echo "[publish] the announce, $REL/DISCORD.md :"
 sed 's/^/  /' "$REL/DISCORD.md"
