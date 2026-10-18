@@ -239,9 +239,14 @@ to the store's drops the folder again.
 Players get one zip, `grf-offline-cyro.zip`: the guides at its root (`START-HERE.html`, `README.txt`),
 `extensions/` (the signed xpi, `dist/chrome` for **Load unpacked**, the cyro-live-patch userscript) and
 `game/` (the client folder). `player-kit/render.mjs` writes the guides from the two templates beside it,
-screenshots from `cws/screenshots/` inlined. The zip and the online copy of the guide are built and
-uploaded by `wtf relay kit-publish` from the monorepo (`robrowser/tools/client-data/grf-offline-publish.sh`),
-after `./sign.sh` signed the manifest's version.
+screenshots from `cws/screenshots/` inlined. `player-kit/publish.sh` builds the zip in `dist/` and uploads
+it, with the online copy of the guide, to Cloudflare R2, after `./sign.sh` signed the manifest's version;
+[`player-kit/PUBLISH.md`](player-kit/PUBLISH.md) is the Cloudflare side, step by step.
+
+```bash
+KIT_GAME_DIR=<client folder> bash player-kit/publish.sh --build-only   # the zip only, tested
+KIT_GAME_DIR=<client folder> bash player-kit/publish.sh                # and the upload
+```
 
 When a store publishes the extension: paste its page's URL in
 [`player-kit/store-links.env`](player-kit/store-links.env) and publish the kit again. That browser's step
