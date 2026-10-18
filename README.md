@@ -1,6 +1,6 @@
 # roBrowser relay — Firefox extension
 
-**Private beta.** Plays the roBrowser Ragnarok Online web client on
+**Private beta.** Plays roBrowser, the web client of the classic Midgard MMO, on
 [robrowser.suuuper.app](https://robrowser.suuuper.app/) with your own game files. It works only with those
 game pages:
 
@@ -183,4 +183,4 @@ keeps the stored folder.
 
 [GPL-3.0-or-later](LICENSE), the licence of roBrowserLegacy, whose pages this extension serves.
 
-Ragnarok Online is a trademark of Gravity Co., Ltd. This project is not affiliated with or endorsed by Gravity.
+An independent, unofficial project, not affiliated with or endorsed by any game publisher.
