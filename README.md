@@ -200,6 +200,30 @@ Firefox ties an installed copy, its updates and its stored folder to the id: nev
 Install a signed xpi by dropping it on Firefox; it stays across restarts, and installing a newer version over it
 keeps the stored folder.
 
+### Chrome Web Store (`cws/`)
+
+Chrome has no signing step on this side: the store signs what it publishes. Build the zip, then upload it
+by hand in the [Developer Dashboard](https://chrome.google.com/webstore/devconsole) (meitogi's Google
+account):
+
+```bash
+node build.mjs
+npx web-ext@10.8.0 build --source-dir dist/chrome --artifacts-dir web-ext-artifacts \
+	--filename 'robrowser-relay-chrome-{version}.zip' --overwrite-dest
+```
+
+The store also refuses a version it has already seen. Attach the same zip to the GitHub release, for loading
+unpacked.
+
+| File | Goes to |
+|---|---|
+| [`LISTING.md`](cws/LISTING.md) | the dashboard's **Store listing** and **Privacy** tabs, field by field: summary, description, category, single purpose, the reason for each permission, the data usage answers |
+| [`PRIVACY.md`](cws/PRIVACY.md) | the privacy policy, linked by its GitHub URL in the **Privacy** tab |
+
+Chrome's extension id comes from the store at the first upload (an unpacked copy gets another one, from its
+folder's path). As in Firefox, the stored folder belongs to that id: a player moving from an unpacked copy
+to the store's drops the folder again.
+
 ## Licence
 
 [GPL-3.0-or-later](LICENSE), the licence of roBrowserLegacy, whose pages this extension serves.
